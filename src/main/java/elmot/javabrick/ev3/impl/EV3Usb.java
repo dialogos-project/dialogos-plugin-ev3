@@ -1,5 +1,6 @@
 package elmot.javabrick.ev3.impl;
 
+import com.clt.lego.ev3.Ev3;
 import elmot.javabrick.ev3.EV3;
 
 import javax.usb.*;
@@ -42,9 +43,14 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
                 UsbEndpoint endpointOut = brick.getUsbEndpoint((byte) 0x1);
                 UsbPipe pipeIn = endpointIn.getUsbPipe();
                 UsbPipe pipeOut = endpointOut.getUsbPipe();
+                
                 pipeOut.open();
                 command.rewind();
                 command.get(dataBlock, 0, command.limit());
+                
+//                System.err.println("\nsend:");  // AKAKAK
+//                Ev3.hexdump(dataBlock);
+                
                 try {
                     pipeOut.syncSubmit(dataBlock);
                 } finally {
@@ -54,18 +60,25 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
                 try {
                     while (true) {
                         pipeIn.syncSubmit(dataBlock);
+                        
                         int length = 2 + (0xff & (int) dataBlock[0]) + (dataBlock[1] << 8);
                         if (length < 3 || length > 1022) {
                             LOGGER.warning("Garbage in USB queue - skipping");
                             continue;
                         }
-                        ByteBuffer response = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
+                        
+                        ByteBuffer response = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);                        
                         response.put(dataBlock, 0, length);
+                        
                         int readSeqNo = response.getShort(2);
                         if (readSeqNo < expectedSeqNo) {
                             LOGGER.warning("Resynch EV3 seq no");
                             continue;
                         }
+                        
+//                        System.err.println("\nreceived:");  // AKAKAK
+//                        Ev3.hexdump(dataBlock);
+                        
                         return response;
                     }
                 } finally {

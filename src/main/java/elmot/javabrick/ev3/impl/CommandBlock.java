@@ -1,5 +1,6 @@
 package elmot.javabrick.ev3.impl;
 
+import com.clt.lego.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
@@ -49,12 +50,15 @@ public class CommandBlock {
             globalVarCount += command.getReplyByteCount();
             command.writeTo(buffer);
         }
+
         int len = buffer.position() - 2;
         buffer.flip();
         buffer.putShort(0, (short) len);
         buffer.putShort(5, (short) globalVarCount);
         buffer.rewind();
+
         ByteBuffer responseBytes = brick.dataExchange(buffer, seqNumber);
+
         int readSeqNo = responseBytes.getShort(2);
         if (readSeqNo != seqNumber) {
             throw new IOException("Unexpected Response seq. no.");
@@ -82,5 +86,4 @@ public class CommandBlock {
             return new Response(0, status);
         }
     }
-
 }

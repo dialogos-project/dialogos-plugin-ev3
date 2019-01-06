@@ -2,6 +2,8 @@ package elmot.javabrick.ev3.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,5 +67,16 @@ public class Command {
 
     public void addIntConstantParam(int val) {
         addIntFourBytes(val, (byte) 0);
+    }
+    
+    public void addShort(int val) {
+        params.add(new byte[] { (byte) (val & 255), (byte) (val >> 8) });
+    }
+    
+    public void addString(String val) {
+        ByteBuffer buf = ByteBuffer.allocate(val.length()+1);
+        buf.put(val.getBytes(StandardCharsets.ISO_8859_1));
+        buf.put((byte) 0);
+        params.add(buf.array());
     }
 }
