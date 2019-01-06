@@ -1,11 +1,11 @@
-package com.clt.dialogos.lego.nxt;
+package com.clt.dialogos.lego.ev3;
 
 import java.io.IOException;
 import java.util.Map;
 
 import com.clt.dialogos.plugin.PluginRuntime;
-import com.clt.lego.nxt.Nxt;
-import com.clt.lego.nxt.Sensor;
+import com.clt.lego.ev3.Sensor;
+import com.clt.lego.ev3.Ev3;
 
 /**
  * @author dabo
@@ -13,10 +13,10 @@ import com.clt.lego.nxt.Sensor;
  */
 public class NxtRuntime implements PluginRuntime {
 
-    private Nxt brick;
+    private Ev3 brick;
     private Map<Sensor.Port, SensorType> sensorTypes;
 
-    public NxtRuntime(Nxt brick, Map<Sensor.Port, SensorType> sensorTypes) {
+    public NxtRuntime(Ev3 brick, Map<Sensor.Port, SensorType> sensorTypes) {
 
         this.brick = brick;
         this.sensorTypes = sensorTypes;
@@ -69,7 +69,7 @@ public class NxtRuntime implements PluginRuntime {
         }
     }
 
-    public Nxt getBrick() {
+    public Ev3 getBrick() {
 
         return this.brick;
     }

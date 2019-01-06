@@ -1,4 +1,4 @@
-package com.clt.lego.nxt;
+package com.clt.lego.ev3;
 
 import java.util.Collection;
 import java.util.HashSet;

@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.io.IOException;
 
 import com.clt.io.InterfaceType;
+import com.clt.lego.ev3.Ev3;
 import com.clt.util.StringTools;
 import com.clt.util.UserCanceledException;
 
@@ -11,7 +12,7 @@ import com.clt.util.UserCanceledException;
  * @author dabo
  *
  */
-public abstract class BrickDescription<T extends Brick> implements Comparable<BrickDescription<T>> {
+public abstract class BrickDescription implements Comparable<BrickDescription> {
     protected String uri;
 
     private BrickInfo brickInfo;
@@ -49,7 +50,7 @@ public abstract class BrickDescription<T extends Brick> implements Comparable<Br
         return this.uri;
     }
 
-    public int compareTo(BrickDescription<T> o) {
+    public int compareTo(BrickDescription o) {
 
         int result = this.getClass().getName().compareTo(o.getClass().getName());
         if (result != 0) {
@@ -63,7 +64,7 @@ public abstract class BrickDescription<T extends Brick> implements Comparable<Br
     public boolean equals(Object o) {
 
         if (o instanceof BrickDescription) {
-            BrickDescription<?> desc = (BrickDescription) o;
+            BrickDescription desc = (BrickDescription) o;
             return this.getClass().equals(desc.getClass())
                     && this.getURI().equals(desc.getURI());
         } else {
@@ -91,8 +92,8 @@ public abstract class BrickDescription<T extends Brick> implements Comparable<Br
         }
     }
 
-    public T createBrick(Component parent) throws IOException, UserCanceledException {
-        T brick = this.createBrickImpl(parent);
+    public Ev3 createBrick(Component parent) throws IOException, UserCanceledException {
+        Ev3 brick = this.createBrickImpl(parent);
         if (brick != null) {
             this.uri = brick.getResourceString();
             this.port = brick.getPort();
@@ -100,5 +101,5 @@ public abstract class BrickDescription<T extends Brick> implements Comparable<Br
         return brick;
     }
 
-    protected abstract T createBrickImpl(Component parent) throws IOException, UserCanceledException;
+    protected abstract Ev3 createBrickImpl(Component parent) throws IOException, UserCanceledException;
 }

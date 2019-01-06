@@ -49,6 +49,11 @@ public class SerialPort {
     public String getPortname() {
         return this.portIdentifier.getName();
     }
+    
+    public void openForEv3() throws IOException {
+        this.open(SerialPort.BAUDRATE_BLUETOOTH, purejavacomm.SerialPort.DATABITS_8,
+                purejavacomm.SerialPort.STOPBITS_1, purejavacomm.SerialPort.PARITY_NONE);
+    }
 
     public void openForNxt() throws IOException {
         this.open(SerialPort.BAUDRATE_BLUETOOTH, purejavacomm.SerialPort.DATABITS_8,

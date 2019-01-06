@@ -1,4 +1,4 @@
-package com.clt.dialogos.lego.nxt.nodes;
+package com.clt.dialogos.lego.ev3.nodes;
 
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -19,12 +19,12 @@ import javax.swing.JPanel;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.nxt.Node;
-import com.clt.dialogos.lego.nxt.NxtRuntime;
-import com.clt.dialogos.lego.nxt.Plugin;
-import com.clt.dialogos.lego.nxt.Resources;
-import com.clt.dialogos.lego.nxt.SensorType;
-import com.clt.dialogos.lego.nxt.Settings;
+import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.NxtRuntime;
+import com.clt.dialogos.lego.ev3.Plugin;
+import com.clt.dialogos.lego.ev3.Resources;
+import com.clt.dialogos.lego.ev3.SensorType;
+import com.clt.dialogos.lego.ev3.Settings;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.Slot;
 import com.clt.diamant.WozInterface;
@@ -32,11 +32,11 @@ import com.clt.diamant.graph.Graph;
 import com.clt.diamant.graph.nodes.NodeExecutionException;
 import com.clt.diamant.graph.search.SearchResult;
 import com.clt.diamant.gui.NodePropertiesDialog;
-import com.clt.lego.nxt.Nxt;
-import com.clt.lego.nxt.Sensor;
+import com.clt.lego.ev3.Sensor;
 import com.clt.script.exp.values.IntValue;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
+import com.clt.lego.ev3.Ev3;
 
 /**
  * @author dabo
@@ -174,7 +174,7 @@ public class ReadSensorNode extends Node {
         try {
             NxtRuntime runtime
                     = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
-            Nxt brick = runtime.getBrick();
+            Ev3 brick = runtime.getBrick();
             if (brick == null) {
                 throw new NodeExecutionException(this, Resources
                         .getString("NoNxtBrickSelected"));

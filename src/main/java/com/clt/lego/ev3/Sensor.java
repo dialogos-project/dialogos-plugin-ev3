@@ -1,4 +1,4 @@
-package com.clt.lego.nxt;
+package com.clt.lego.ev3;
 
 import java.io.IOException;
 
@@ -130,12 +130,12 @@ public class Sensor {
         }
     }
 
-    private Nxt brick;
+    private Ev3 brick;
     private Port port;
     private Type type;
     private Mode mode;
 
-    public Sensor(Nxt brick, Port port) {
+    public Sensor(Ev3 brick, Port port) {
 
         if (brick == null) {
             throw new IllegalArgumentException();
@@ -196,14 +196,11 @@ public class Sensor {
         } catch (InterruptedException exn) {
             exn.printStackTrace();
         }
-        byte[] answer
-                = this.brick.lsRead(this.port.id, new byte[]{0x02, 0x42}, 1);
+        byte[] answer = this.brick.lsRead(this.port.id, new byte[]{0x02, 0x42}, 1);
         return answer[Math.min(4, answer.length - 1)] & 0xFF;
     }
 
-    public Type getType()
-            throws IOException {
-
+    public Type getType() throws IOException {
         if (this.type != null) {
             return this.type;
         } else {
@@ -211,8 +208,7 @@ public class Sensor {
         }
     }
 
-    public Mode getMode()
-            throws IOException {
+    public Mode getMode() throws IOException {
 
         if (this.mode != null) {
             return this.mode;

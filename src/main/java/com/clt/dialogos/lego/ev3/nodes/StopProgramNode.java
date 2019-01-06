@@ -1,4 +1,4 @@
-package com.clt.dialogos.lego.nxt.nodes;
+package com.clt.dialogos.lego.ev3.nodes;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -9,10 +9,10 @@ import javax.swing.JPanel;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.nxt.Node;
-import com.clt.dialogos.lego.nxt.NxtRuntime;
-import com.clt.dialogos.lego.nxt.Plugin;
-import com.clt.dialogos.lego.nxt.Resources;
+import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.NxtRuntime;
+import com.clt.dialogos.lego.ev3.Plugin;
+import com.clt.dialogos.lego.ev3.Resources;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.WozInterface;
 import com.clt.diamant.graph.Graph;

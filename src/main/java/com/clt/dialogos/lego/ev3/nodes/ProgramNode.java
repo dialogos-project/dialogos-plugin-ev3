@@ -1,4 +1,4 @@
-package com.clt.dialogos.lego.nxt.nodes;
+package com.clt.dialogos.lego.ev3.nodes;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -14,11 +14,11 @@ import javax.swing.text.JTextComponent;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.nxt.Node;
-import com.clt.dialogos.lego.nxt.NxtRuntime;
-import com.clt.dialogos.lego.nxt.Plugin;
-import com.clt.dialogos.lego.nxt.Resources;
-import com.clt.dialogos.lego.nxt.Settings;
+import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.NxtRuntime;
+import com.clt.dialogos.lego.ev3.Plugin;
+import com.clt.dialogos.lego.ev3.Resources;
+import com.clt.dialogos.lego.ev3.Settings;
 import com.clt.diamant.IdMap;
 import com.clt.diamant.WozInterface;
 import com.clt.diamant.graph.Graph;
@@ -30,12 +30,12 @@ import com.clt.gui.CmdButton;
 import com.clt.gui.ListSelectionDialog;
 import com.clt.gui.OptionPane;
 import com.clt.gui.ProgressDialog;
-import com.clt.lego.nxt.Nxt;
 import com.clt.script.cmd.ExecutionException;
 import com.clt.util.AbstractLongCallable;
 import com.clt.util.StringTools;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
+import com.clt.lego.ev3.Ev3;
 
 /**
  * @author dabo
@@ -94,7 +94,7 @@ public class ProgramNode extends Node {
                                         throws Exception {
 
                                     String[] programs = null;
-                                    Nxt brick = settings.createBrick(p);
+                                    Ev3 brick = settings.createBrick(p);
                                     if (brick != null) {
                                         try {
                                             programs = brick.getPrograms();

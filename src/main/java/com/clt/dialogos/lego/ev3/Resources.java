@@ -1,4 +1,4 @@
-package com.clt.dialogos.lego.nxt;
+package com.clt.dialogos.lego.ev3;
 
 import com.clt.resources.DynamicResourceBundle;
 import com.clt.util.StringTools;

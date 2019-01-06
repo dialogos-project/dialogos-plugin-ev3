@@ -1,5 +1,5 @@
 
-package com.clt.lego.nxt;
+package com.clt.lego.ev3;
 
 import com.clt.lego.BrickException;
 import com.clt.resources.DynamicResourceBundle;

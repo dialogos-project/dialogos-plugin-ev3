@@ -1,4 +1,4 @@
-package com.clt.lego.nxt;
+package com.clt.lego.ev3;
 
 import java.io.IOException;
 
@@ -77,11 +77,11 @@ public class Motor {
         }
     }
 
-    private Nxt brick;
+    private Ev3 brick;
     private Port port;
     private int power;
 
-    public Motor(Nxt brick, Port port) {
+    public Motor(Ev3 brick, Port port) {
 
         if (brick == null) {
             throw new IllegalArgumentException();
@@ -134,8 +134,7 @@ public class Motor {
                     // + Mode.REGULATED.getValue(), Regulation.SPEED, 0, State.RAMPDOWN,
                     // degrees);
                     long time = System.currentTimeMillis();
-                    while ((Motor.this.brick.getOutputState(Motor.this.port)
-                            .getRotationCount() < degrees)
+                    while ((Motor.this.brick.getOutputState(Motor.this.port).getRotationCount() < degrees)
                             && (System.currentTimeMillis() < time + 10000)) {
                         ;
                     }

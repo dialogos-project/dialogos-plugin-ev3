@@ -1,13 +1,13 @@
-package com.clt.dialogos.lego.nxt;
+package com.clt.dialogos.lego.ev3;
 
 import java.util.Arrays;
 
 import javax.swing.Icon;
 
-import com.clt.dialogos.lego.nxt.nodes.MotorNode;
-import com.clt.dialogos.lego.nxt.nodes.ProgramNode;
-import com.clt.dialogos.lego.nxt.nodes.ReadSensorNode;
-import com.clt.dialogos.lego.nxt.nodes.StopProgramNode;
+import com.clt.dialogos.lego.ev3.nodes.MotorNode;
+import com.clt.dialogos.lego.ev3.nodes.ProgramNode;
+import com.clt.dialogos.lego.ev3.nodes.ReadSensorNode;
+import com.clt.dialogos.lego.ev3.nodes.StopProgramNode;
 import com.clt.dialogos.plugin.PluginSettings;
 import static com.clt.diamant.graph.Node.registerNodeTypes;
 import com.clt.gui.Images;
@@ -25,17 +25,17 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
 
     @Override
     public String getId() {
-        return "dialogos.plugin.lego";
+        return "dialogos.plugin.lego.ev3";
     }
 
     @Override
     public String getName() {
-        return "Lego Mindstorms NXT";
+        return "Lego Mindstorms EV3";
     }
 
     @Override
     public Icon getIcon() {
-        return Images.load(this, "Lego.png");
+        return Images.load(this, "LegoEv3.png");
     }
 
     @Override

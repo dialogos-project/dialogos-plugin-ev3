@@ -1,4 +1,4 @@
-package com.clt.lego.nxt;
+package com.clt.lego.ev3;
 
 import com.clt.resources.DynamicResourceBundle;
 

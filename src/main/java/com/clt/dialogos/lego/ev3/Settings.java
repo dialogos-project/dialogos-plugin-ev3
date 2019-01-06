@@ -1,4 +1,4 @@
-package com.clt.dialogos.lego.nxt;
+package com.clt.dialogos.lego.ev3;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -31,10 +31,8 @@ import com.clt.gui.OptionPane;
 import com.clt.gui.ProgressDialog;
 import com.clt.io.InterfaceType;
 import com.clt.lego.BrickDescription;
-import com.clt.lego.nxt.AbstractNxt;
-import com.clt.lego.nxt.Nxt;
-import com.clt.lego.nxt.NxtDeviceInfo;
-import com.clt.lego.nxt.Sensor;
+import com.clt.lego.ev3.NxtDeviceInfo;
+import com.clt.lego.ev3.Sensor;
 import com.clt.properties.DefaultEnumProperty;
 import com.clt.properties.Property;
 import com.clt.properties.PropertySet;
@@ -45,33 +43,36 @@ import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import java.util.ArrayList;
 import java.util.List;
+import com.clt.lego.ev3.Ev3;
 
 /**
  * @author dabo, koller
  */
 public class Settings extends PluginSettings {
 
-    private static Collection<BrickDescription<? extends Nxt>> availablePorts = new TreeSet<BrickDescription<? extends Nxt>>();
-    private DefaultEnumProperty<BrickDescription<? extends Nxt>> nxt;
+    private static Collection<BrickDescription> availablePorts = new TreeSet<BrickDescription>();
+    private DefaultEnumProperty<BrickDescription> nxt;
     private Map<Sensor.Port, DefaultEnumProperty<SensorType>> sensorTypes;
 
+    /* FIXME
     static {
-        Settings.availablePorts.add(new BrickDescription<Nxt>("-", null, null, null) {
+        Settings.availablePorts.add(new BrickDescription<Ev3>("-", null, null, null) {
             @Override
-            protected Nxt createBrickImpl(Component parent) {
+            protected Ev3 createBrickImpl(Component parent) {
                 return null;
             }
         });
     }
+*/
 
     @SuppressWarnings("unchecked")
-    private BrickDescription<Nxt>[] getAvailablePorts() {
+    private BrickDescription[] getAvailablePorts() {
         return Settings.availablePorts.toArray(new BrickDescription[Settings.availablePorts.size()]);
     }
 
     public Settings() {
 
-        this.nxt = new DefaultEnumProperty<BrickDescription<? extends Nxt>>("nxt", Resources.getString("NxtBrick"), null, this.getAvailablePorts()) {
+        this.nxt = new DefaultEnumProperty<BrickDescription>("nxt", Resources.getString("NxtBrick"), null, this.getAvailablePorts()) {
             @Override
             public String getName() {
                 return Resources.getString("NxtBrick");
@@ -91,7 +92,7 @@ public class Settings extends PluginSettings {
         // updateBrickList(null, true);
     }
 
-    private void addBrick(BrickDescription<Nxt> desc) {
+    private void addBrick(BrickDescription  desc) {
         Settings.availablePorts.add(desc);
         this.nxt.setPossibleValues(this.getAvailablePorts());
         this.nxt.setValue(desc);
@@ -122,8 +123,8 @@ public class Settings extends PluginSettings {
 
                             boolean foundNewBrick = false;
 
-                            Collection<BrickDescription<? extends Nxt>> availableBricks
-                                    = AbstractNxt.getAvailableBricks(d, progress, this.cancel, null);
+                            Collection<BrickDescription> availableBricks = null; // FIXME
+//                                    = AbstractEv3.getAvailableBricks(d, progress, this.cancel, null);
 
                             // remove bricks that are no longer connected
                             List<BrickDescription> availablePortsCopy = new ArrayList<>(Settings.availablePorts); // to avoid ConcurrentModificationException
@@ -166,7 +167,7 @@ public class Settings extends PluginSettings {
             System.err.println(exn);
         }
 
-        BrickDescription<Nxt>[] available = getAvailablePorts();
+        BrickDescription[] available = getAvailablePorts();
         this.nxt.setPossibleValues(available);
 
         // display the first of the newly found bricks in
@@ -253,7 +254,7 @@ public class Settings extends PluginSettings {
                         throws SAXException {
 
                     try {
-                        BrickDescription<Nxt> desc
+                        BrickDescription desc
                                 = (BrickDescription) this.factory.getConstructor(
                                         new Class[]{String.class, NxtDeviceInfo.class,
                                             InterfaceType.class, String.class}).newInstance(
@@ -312,7 +313,7 @@ public class Settings extends PluginSettings {
     @Override
     public void writeAttributes(XMLWriter out, IdMap uidMap) {
 
-        BrickDescription<?> nxt = this.nxt.getValue();
+        BrickDescription nxt = this.nxt.getValue();
         if ((nxt != null) && (nxt.getInterfaceType() != null)) {
             Graph.printAtt(out, "nxt", "nxt", null);
             Graph.printAtt(out, "factory", nxt.getClass().getName());
@@ -339,7 +340,7 @@ public class Settings extends PluginSettings {
         return this.sensorTypes.get(port).getValue();
     }
 
-    public Nxt createBrick(Component parent)
+    public Ev3 createBrick(Component parent)
             throws IOException, UserCanceledException {
 
         if (this.nxt.getValue() != null) {

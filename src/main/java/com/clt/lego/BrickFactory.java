@@ -9,10 +9,10 @@ import com.clt.util.UserCanceledException;
  * @author dabo
  *
  */
-public interface BrickFactory<T extends Brick> {
+public interface BrickFactory {
 
     public String[] getAvailablePorts() throws IOException;
 
-    public BrickDescription<T> getBrickInfo(Component parent, String port)
+    public BrickDescription getBrickInfo(Component parent, String port)
             throws IOException, UserCanceledException;
 }
