@@ -3,7 +3,6 @@ package com.clt.dialogos.lego.ev3.nodes;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -15,12 +14,11 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.Ev3Node;
 import com.clt.dialogos.lego.ev3.NxtRuntime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
@@ -29,18 +27,16 @@ import com.clt.diamant.WozInterface;
 import com.clt.diamant.graph.Graph;
 import com.clt.diamant.graph.nodes.NodeExecutionException;
 import com.clt.diamant.gui.NodePropertiesDialog;
-import com.clt.lego.ev3.Motor;
-import com.clt.script.exp.Value;
-import com.clt.script.exp.values.IntValue;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
-import com.clt.lego.ev3.Ev3;
+import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.MotorFactory;
 
 /**
  * @author dabo
  *
  */
-public class MotorNode extends Node {
+public class MotorNode extends Ev3Node {
 
     private static final String MOTOR = "motor";
     private static final String STATE = "state";
@@ -55,7 +51,6 @@ public class MotorNode extends Node {
 
         @Override
         public String toString() {
-
             return Resources.getString("MOTORSTATE_" + this.name());
         }
     };
@@ -64,68 +59,61 @@ public class MotorNode extends Node {
 
         this.setColor(new Color(255, 255, 153));
 
-        this.setProperty(MotorNode.MOTOR, Motor.Port.A);
-        this.setProperty(MotorNode.STATE, State.DRIFT);
+        this.setProperty(MotorNode.MOTOR, MotorFactory.MOTORSET.A); //  Motor.Port.A);
+        this.setProperty(MotorNode.STATE, State.FORWARD);
         this.setProperty(MotorNode.POWER, "80");
+        
 
         this.addEdge();
     }
-
+    
     @Override
-    protected int executeNXT(WozInterface comm) {
-
+    protected int executeEv3(WozInterface comm) {
         try {
-            NxtRuntime runtime
-                    = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
-            Ev3 brick = runtime.getBrick();
+            NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            EV3 brick = runtime.getBrick();
+            
             if (brick == null) {
-                throw new NodeExecutionException(this, Resources
-                        .getString("NoNxtBrickSelected"));
+                throw new NodeExecutionException(this, Resources.getString("NoNxtBrickSelected"));
             }
-
-            Motor.Port port = (Motor.Port) this.getProperty(MotorNode.MOTOR);
-            if (port == null) {
-                throw new NodeExecutionException(this, Resources
-                        .getString("NoMotorSelected"));
+            
+            MotorFactory.MOTORSET motorSet = (MotorFactory.MOTORSET) getProperty(MOTOR);
+            if (motorSet == null) {
+                throw new NodeExecutionException(this, Resources.getString("NoMotorSelected"));
             }
-
-            State state = (State) this.getProperty(MotorNode.STATE);
+            
+            State state = (State) getProperty(STATE);
             if (state == null) {
-                throw new NodeExecutionException(this, Resources
-                        .getString("NoMotorStateSelected"));
+                throw new NodeExecutionException(this, Resources.getString("NoMotorStateSelected"));
             }
-
-            Motor motor = new Motor(brick, port);
-            String power = (String) this.getProperty(MotorNode.POWER);
-            if (power != null) {
-                Value pwr = this.parseExpression(power).evaluate(comm);
-                if (pwr instanceof IntValue) {
-                    motor.setPower((int) ((IntValue) pwr).getInt());
-                } else {
-                    throw new NodeExecutionException(this, Resources
-                            .getString("IllegalPowerValue"));
-                }
-            }
-
-            switch (state) {
+            
+            int power = Integer.parseInt((String) getProperty(POWER));
+            brick.MOTOR.speed(motorSet, power);
+            
+            switch(state) {
                 case FORWARD:
-                    motor.forward();
+                    brick.MOTOR.direction(motorSet, MotorFactory.DIR.FORWARD);
+                    brick.MOTOR.start(motorSet);
                     break;
+                    
+                    
                 case BACKWARD:
-                    motor.backward();
+                    brick.MOTOR.direction(motorSet, MotorFactory.DIR.BACK);
+                    brick.MOTOR.start(motorSet);
                     break;
+                    
                 case STOP:
-                    motor.stop();
+                    brick.MOTOR.stop(motorSet, MotorFactory.BRAKE.BRAKE);
                     break;
+                    
                 case DRIFT:
-                    motor.drift();
-                    break;
+                    brick.MOTOR.stop(motorSet, MotorFactory.BRAKE.COAST);
+                    break;                    
             }
         } catch (NodeExecutionException exn) {
             throw exn;
         } catch (Exception exn) {
-            throw new NodeExecutionException(this, Resources
-                    .getString("CouldNotControlMotor"), exn);
+            throw new NodeExecutionException(this, Resources.getString("CouldNotControlMotor"), exn);
         }
 
         return 0;
@@ -146,34 +134,22 @@ public class MotorNode extends Node {
 
         p.add(new JLabel(Resources.getString("MotorPort") + ':'), gbc);
         gbc.gridx++;
-        /*
-     * final JComboBox motor = NodePropertiesDialog.createComboBox(properties,
-     * MOTOR, Motor.Port.values());
-         */
-        JRadioButton ports[]
-                = NodePropertiesDialog.createRadioButtons(properties, MotorNode.MOTOR,
-                        Motor.Port.values());
-        JPanel motor = new JPanel(new GridLayout(1, 0, 12, 12));
-        for (JRadioButton b : ports) {
-            motor.add(b);
-        }
+        
+        final JComboBox motor = NodePropertiesDialog.createComboBox(properties, MOTOR, MotorFactory.MOTORSET.values());
         p.add(motor, gbc);
 
         gbc.gridy++;
         gbc.gridx = 0;
         p.add(new JLabel(Resources.getString("MotorState") + ':'), gbc);
         gbc.gridx++;
-        final JComboBox state
-                = NodePropertiesDialog.createComboBox(properties, MotorNode.STATE,
-                        State.values());
+        final JComboBox state = NodePropertiesDialog.createComboBox(properties, MotorNode.STATE, State.values());
         p.add(state, gbc);
 
         gbc.gridy++;
         gbc.gridx = 0;
         p.add(new JLabel(Resources.getString("MotorPower") + ':'), gbc);
         gbc.gridx++;
-        final JTextField power
-                = NodePropertiesDialog.createTextField(properties, MotorNode.POWER);
+        final JTextField power = NodePropertiesDialog.createTextField(properties, MotorNode.POWER);
         p.add(power, gbc);
 
         ItemListener l = new ItemListener() {
@@ -198,29 +174,34 @@ public class MotorNode extends Node {
 
         return p;
     }
+    
+    private MotorFactory.MOTORSET getMotorset() {
+        return (MotorFactory.MOTORSET) getProperty(MOTOR);
+    }
+    
+    private State getState() {
+        return (State) getProperty(STATE);
+    }
+    
+    private String getPower() {
+        return (String) getProperty(POWER);
+    }
 
     @Override
-    protected void readAttribute(XMLReader r, String name, String value,
-            IdMap uid_map)
-            throws SAXException {
-
+    protected void readAttribute(XMLReader r, String name, String value, IdMap uid_map) throws SAXException {
         if (name.equals(MotorNode.MOTOR)) {
-            for (Motor.Port port : Motor.Port.values()) {
-                if (String.valueOf(port.getID()).equals(value)) {
-                    this.setProperty(MotorNode.MOTOR, port);
-                    break;
-                }
-            }
+            MotorFactory.MOTORSET motorset = MotorFactory.MOTORSET.valueOf(value);
+            setProperty(MOTOR, motorset);
+            
             if (this.getProperty(MotorNode.MOTOR) == null) {
                 r.raiseException(Resources.format("UnknownMotor", value));
             }
         } else if (name.equals(MotorNode.STATE)) {
-            for (State state : State.values()) {
-                if (state.name().equals(value)) {
-                    this.setProperty(MotorNode.STATE, state);
-                    break;
-                }
-            }
+            System.err.println("decode state " + value);
+            State state = State.valueOf(value);
+            System.err.println("to: " + state);
+            setProperty(STATE, state);
+
             if (this.getProperty(MotorNode.STATE) == null) {
                 r.raiseException(Resources.format("UnknownMotorState", value));
             }
@@ -233,22 +214,10 @@ public class MotorNode extends Node {
 
     @Override
     protected void writeAttributes(XMLWriter out, IdMap uid_map) {
-
         super.writeAttributes(out, uid_map);
-
-        Motor.Port port = (Motor.Port) this.getProperty(MotorNode.MOTOR);
-        if (port != null) {
-            Graph.printAtt(out, MotorNode.MOTOR, port.getID());
-        }
-
-        State state = (State) this.getProperty(MotorNode.STATE);
-        if (state != null) {
-            Graph.printAtt(out, MotorNode.STATE, state.name());
-        }
-
-        if (this.getProperty(MotorNode.POWER) != null) {
-            Graph.printAtt(out, MotorNode.POWER, (String) this
-                    .getProperty(MotorNode.POWER));
-        }
+        
+        Graph.printAtt(out, MOTOR, getMotorset().name());
+        Graph.printAtt(out, STATE, getState().name());
+        Graph.printAtt(out, POWER, getPower());
     }
 }

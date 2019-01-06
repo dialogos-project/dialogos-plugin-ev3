@@ -53,6 +53,4 @@ public abstract class EV3 implements AutoCloseable {
     }
 
     public abstract ByteBuffer dataExchange(ByteBuffer bytes, int expectedSeqNo) throws IOException;
-
-    public abstract String getPort();
 }

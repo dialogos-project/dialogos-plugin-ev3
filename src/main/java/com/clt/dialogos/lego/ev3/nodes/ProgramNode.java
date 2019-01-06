@@ -14,7 +14,7 @@ import javax.swing.text.JTextComponent;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.Ev3Node;
 import com.clt.dialogos.lego.ev3.NxtRuntime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
@@ -35,13 +35,13 @@ import com.clt.util.AbstractLongCallable;
 import com.clt.util.StringTools;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
-import com.clt.lego.ev3.Ev3;
+import elmot.javabrick.ev3.EV3;
 
 /**
  * @author dabo
  *
  */
-public class ProgramNode extends Node {
+public class ProgramNode extends Ev3Node {
 
     private static final String PROGRAM_NAME = "program";
     private static final String WAIT = "wait";
@@ -77,11 +77,10 @@ public class ProgramNode extends Node {
 
             public void run() {
 
-                final Settings settings
-                        = (Settings) ProgramNode.this.getPluginSettings(Plugin.class);
+                final Settings settings = (Settings) ProgramNode.this.getPluginSettings(Plugin.class);
+                
                 try {
-                    String[] programs
-                            = new ProgressDialog(p, 200).run(new AbstractLongCallable<String[]>() {
+                    String[] programs = new ProgressDialog(p, 200).run(new AbstractLongCallable<String[]>() {
 
                                 @Override
                                 public String getDescription() {
@@ -90,11 +89,16 @@ public class ProgramNode extends Node {
                                 }
 
                                 @Override
-                                protected String[] call(ProgressListener l)
-                                        throws Exception {
+                                protected String[] call(ProgressListener l) throws Exception {
 
                                     String[] programs = null;
-                                    Ev3 brick = settings.createBrick(p);
+                                    EV3 brick = settings.createBrick(p);
+                                    
+                                    // TODO implement me
+                                    
+                                    return new String[0];
+                                    
+                                    /*
                                     if (brick != null) {
                                         try {
                                             programs = brick.getPrograms();
@@ -103,6 +107,7 @@ public class ProgramNode extends Node {
                                         }
                                     }
                                     return programs;
+*/
                                 }
                             });
 
@@ -145,7 +150,7 @@ public class ProgramNode extends Node {
     }
 
     @Override
-    protected int executeNXT(WozInterface comm) {
+    protected int executeEv3(WozInterface comm) {
 
         String program = (String) this.properties.get(ProgramNode.PROGRAM_NAME);
         if (program == null) {
@@ -154,11 +159,14 @@ public class ProgramNode extends Node {
         }
 
         try {
-            NxtRuntime runtime
-                    = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            
             if (runtime.getBrick() == null) {
                 throw new ExecutionException(Resources.getString("NoNxtBrickSelected"));
             }
+            
+            // TODO implement me
+            /*
             runtime.getBrick().startProgram(program);
 
             if (this.getBooleanProperty(ProgramNode.WAIT)) {
@@ -166,6 +174,7 @@ public class ProgramNode extends Node {
                     Thread.sleep(50);
                 }
             }
+*/
         } catch (Exception exn) {
             throw new NodeExecutionException(this, Resources
                     .getString("CouldNotStartProgram"), exn);

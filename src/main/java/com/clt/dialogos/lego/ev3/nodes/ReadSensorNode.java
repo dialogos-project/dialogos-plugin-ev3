@@ -19,7 +19,7 @@ import javax.swing.JPanel;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.Ev3Node;
 import com.clt.dialogos.lego.ev3.NxtRuntime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
@@ -36,13 +36,13 @@ import com.clt.lego.ev3.Sensor;
 import com.clt.script.exp.values.IntValue;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
-import com.clt.lego.ev3.Ev3;
+import elmot.javabrick.ev3.EV3;
 
 /**
  * @author dabo
  *
  */
-public class ReadSensorNode extends Node {
+public class ReadSensorNode extends Ev3Node {
 
     private static final String SENSOR = "sensor";
     private static final String MODE = "mode";
@@ -169,28 +169,26 @@ public class ReadSensorNode extends Node {
     }
 
     @Override
-    protected int executeNXT(WozInterface comm) {
+    protected int executeEv3(WozInterface comm) {
 
         try {
-            NxtRuntime runtime
-                    = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
-            Ev3 brick = runtime.getBrick();
+            NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            EV3 brick = runtime.getBrick();
+            
+            
             if (brick == null) {
-                throw new NodeExecutionException(this, Resources
-                        .getString("NoNxtBrickSelected"));
+                throw new NodeExecutionException(this, Resources .getString("NoNxtBrickSelected"));
             }
 
-            SensorPort sensorPort
-                    = (SensorPort) this.getProperty(ReadSensorNode.SENSOR);
+            SensorPort sensorPort = (SensorPort) this.getProperty(ReadSensorNode.SENSOR);
             if (sensorPort == null) {
-                throw new NodeExecutionException(this, Resources
-                        .getString("NoSensorSelected"));
+                throw new NodeExecutionException(this, Resources.getString("NoSensorSelected"));
             }
+            
             boolean activate = this.getBooleanProperty(ReadSensorNode.ACTIVATE);
             Sensor.Mode mode = (Sensor.Mode) this.getProperty(ReadSensorNode.MODE);
             if (mode == null) {
-                throw new NodeExecutionException(this, Resources
-                        .getString("SensorModeNotSet"));
+                throw new NodeExecutionException(this, Resources.getString("SensorModeNotSet"));
             }
 
             Slot v = (Slot) this.getProperty(ReadSensorNode.VARIABLE);
@@ -198,7 +196,10 @@ public class ReadSensorNode extends Node {
                 throw new NodeExecutionException(this,
                         com.clt.diamant.Resources.getString("NoVariableAssigned"));
             }
+            
+            // TODO implement me
 
+            /*
             Sensor sensor = new Sensor(brick, sensorPort.getPort());
             SensorType type = runtime.getSensorType(sensorPort.getPort());
             switch (type) {
@@ -222,11 +223,11 @@ public class ReadSensorNode extends Node {
 
             int value = sensor.getValue();
             v.setValue(new IntValue(value));
+*/
         } catch (NodeExecutionException exn) {
             throw exn;
         } catch (Exception exn) {
-            throw new NodeExecutionException(this, Resources
-                    .getString("CouldNotReadSensor"), exn);
+            throw new NodeExecutionException(this, Resources.getString("CouldNotReadSensor"), exn);
         }
         return 0;
     }

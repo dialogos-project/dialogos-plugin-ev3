@@ -13,5 +13,5 @@ import java.io.IOException;
  */
 public interface CommInterface {
     public void send(byte[] data) throws IOException;
-    public byte[] readResponse(int expectedLength) throws IOException;
+    public byte[] read(int expectedLength) throws IOException;
 }

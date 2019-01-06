@@ -20,7 +20,12 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
 
     @Override
     public void initialize() {
-        registerNodeTypes(this.getName(), Arrays.asList(new Class<?>[]{ProgramNode.class, StopProgramNode.class, ReadSensorNode.class, MotorNode.class}));
+        registerNodeTypes(this.getName(), Arrays.asList(new Class<?>[]{
+//            ProgramNode.class, 
+//            StopProgramNode.class, 
+//            ReadSensorNode.class, 
+            MotorNode.class
+        }));
     }
 
     @Override

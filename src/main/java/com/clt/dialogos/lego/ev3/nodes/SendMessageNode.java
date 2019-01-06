@@ -14,7 +14,7 @@ import javax.swing.JPanel;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.Ev3Node;
 import com.clt.dialogos.lego.ev3.NxtRuntime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
@@ -28,13 +28,13 @@ import com.clt.script.exp.values.IntValue;
 import com.clt.script.exp.values.StringValue;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
-import com.clt.lego.ev3.Ev3;
+import elmot.javabrick.ev3.EV3;
 
 /**
  * @author Daniel Bobbert
  *
  */
-public class SendMessageNode extends Node {
+public class SendMessageNode extends Ev3Node {
 
     private static final String MAILBOX = "mailbox";
     private static final String MESSAGE = "message";
@@ -81,19 +81,18 @@ public class SendMessageNode extends Node {
     }
 
     @Override
-    protected int executeNXT(WozInterface comm) {
+    protected int executeEv3(WozInterface comm) {
 
         NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
-        Ev3 brick = runtime.getBrick();
+        EV3 brick = runtime.getBrick();
+        
         if (brick == null) {
-            throw new NodeExecutionException(this, Resources
-                    .getString("NoNxtBrickSelected"));
+            throw new NodeExecutionException(this, Resources.getString("NoNxtBrickSelected"));
         }
 
         Integer mailbox = (Integer) this.properties.get(SendMessageNode.MAILBOX);
         if (mailbox == null) {
-            throw new NodeExecutionException(this, Resources
-                    .getString("NoMailboxSelected"));
+            throw new NodeExecutionException(this, Resources.getString("NoMailboxSelected"));
         }
 
         try {
@@ -113,13 +112,17 @@ public class SendMessageNode extends Node {
             } else {
                 message = msg.toString();
             }
+            
+            // TODO implement me
+            
+            /*
 
             brick.sendMessage(mailbox.intValue() - 1, message);
+*/
         } catch (NodeExecutionException exn) {
             throw exn;
         } catch (Exception exn) {
-            throw new NodeExecutionException(this, Resources
-                    .getString("CouldNotSendMessage"), exn);
+            throw new NodeExecutionException(this, Resources.getString("CouldNotSendMessage"), exn);
         }
 
         // TODO Auto-generated method stub

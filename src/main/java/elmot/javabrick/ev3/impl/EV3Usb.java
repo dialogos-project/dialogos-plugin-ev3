@@ -78,9 +78,4 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
             throw new IOException(e);
         }
     }
-
-    @Override
-    public String getPort() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

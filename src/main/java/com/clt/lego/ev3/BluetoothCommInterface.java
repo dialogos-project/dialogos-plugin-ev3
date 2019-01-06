@@ -67,7 +67,7 @@ public class BluetoothCommInterface implements CommInterface{
     }
 
     @Override
-    public byte[] readResponse(int expectedLength) throws IOException {
+    public byte[] read(int expectedLength) throws IOException {
 //        int responseLength = (int) BrickUtils.readNum(serialPort.getInputStream(), 2, false);
         byte[] response = new byte[expectedLength];
         

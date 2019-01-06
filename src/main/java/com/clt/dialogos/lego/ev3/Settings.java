@@ -25,13 +25,10 @@ import org.xml.sax.SAXException;
 
 import com.clt.dialogos.plugin.PluginSettings;
 import com.clt.diamant.IdMap;
-import com.clt.diamant.graph.Graph;
 import com.clt.event.ProgressListener;
 import com.clt.gui.OptionPane;
 import com.clt.gui.ProgressDialog;
 import com.clt.io.InterfaceType;
-import com.clt.lego.BrickDescription;
-import com.clt.lego.ev3.NxtDeviceInfo;
 import com.clt.lego.ev3.Sensor;
 import com.clt.properties.DefaultEnumProperty;
 import com.clt.properties.Property;
@@ -43,36 +40,30 @@ import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import java.util.ArrayList;
 import java.util.List;
-import com.clt.lego.ev3.Ev3;
+import com.clt.lego.ev3.Ev3Descriptor;
+import elmot.javabrick.ev3.EV3;
 
 /**
  * @author dabo, koller
  */
 public class Settings extends PluginSettings {
 
-    private static Collection<BrickDescription> availablePorts = new TreeSet<BrickDescription>();
-    private DefaultEnumProperty<BrickDescription> nxt;
+    private static Collection<Ev3Descriptor> availablePorts = new TreeSet<Ev3Descriptor>();
+    private DefaultEnumProperty<Ev3Descriptor> ev3;
     private Map<Sensor.Port, DefaultEnumProperty<SensorType>> sensorTypes;
 
-    /* FIXME
     static {
-        Settings.availablePorts.add(new BrickDescription<Ev3>("-", null, null, null) {
-            @Override
-            protected Ev3 createBrickImpl(Component parent) {
-                return null;
-            }
-        });
+        Settings.availablePorts.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.DUMMY, "--"));
     }
-*/
 
     @SuppressWarnings("unchecked")
-    private BrickDescription[] getAvailablePorts() {
-        return Settings.availablePorts.toArray(new BrickDescription[Settings.availablePorts.size()]);
+    private Ev3Descriptor[] getAvailablePorts() {
+        return Settings.availablePorts.toArray(new Ev3Descriptor[Settings.availablePorts.size()]);
     }
 
     public Settings() {
 
-        this.nxt = new DefaultEnumProperty<BrickDescription>("nxt", Resources.getString("NxtBrick"), null, this.getAvailablePorts()) {
+        this.ev3 = new DefaultEnumProperty<Ev3Descriptor>("ev3", Resources.getString("NxtBrick"), null, this.getAvailablePorts()) {
             @Override
             public String getName() {
                 return Resources.getString("NxtBrick");
@@ -80,7 +71,7 @@ public class Settings extends PluginSettings {
         };
 
         if (!Settings.availablePorts.isEmpty()) {
-            this.nxt.setValue(Settings.availablePorts.iterator().next());
+            this.ev3.setValue(Settings.availablePorts.iterator().next());
         }
 
         this.sensorTypes = new LinkedHashMap<Sensor.Port, DefaultEnumProperty<SensorType>>();
@@ -92,10 +83,10 @@ public class Settings extends PluginSettings {
         // updateBrickList(null, true);
     }
 
-    private void addBrick(BrickDescription  desc) {
+    private void addBrick(Ev3Descriptor  desc) {
         Settings.availablePorts.add(desc);
-        this.nxt.setPossibleValues(this.getAvailablePorts());
-        this.nxt.setValue(desc);
+        this.ev3.setPossibleValues(this.getAvailablePorts());
+        this.ev3.setValue(desc);
     }
 
     private void updateBrickList(Component parent, boolean search) {
@@ -122,20 +113,20 @@ public class Settings extends PluginSettings {
                             PrintWriter pw = new PrintWriter(log, true);
 
                             boolean foundNewBrick = false;
-
-                            Collection<BrickDescription> availableBricks = null; // FIXME
-//                                    = AbstractEv3.getAvailableBricks(d, progress, this.cancel, null);
+                            
+                            Ev3Descriptor.discoverAll();
+                            List<Ev3Descriptor> availableBricks = Ev3Descriptor.getAllDescriptors();
 
                             // remove bricks that are no longer connected
-                            List<BrickDescription> availablePortsCopy = new ArrayList<>(Settings.availablePorts); // to avoid ConcurrentModificationException
-                            for (BrickDescription x : availablePortsCopy) {
+                            List<Ev3Descriptor> availablePortsCopy = new ArrayList<>(Settings.availablePorts); // to avoid ConcurrentModificationException
+                            for (Ev3Descriptor x : availablePortsCopy) {
                                 if (!availableBricks.contains(x)) {
                                     Settings.availablePorts.remove(x);
                                 }
                             }
 
                             // add bricks that were newly connected
-                            for (BrickDescription x : availableBricks) {
+                            for (Ev3Descriptor x : availableBricks) {
                                 if (!Settings.availablePorts.contains(x)) {
                                     foundNewBrick = true;
                                     addBrick(x);
@@ -167,13 +158,13 @@ public class Settings extends PluginSettings {
             System.err.println(exn);
         }
 
-        BrickDescription[] available = getAvailablePorts();
-        this.nxt.setPossibleValues(available);
+        Ev3Descriptor[] available = getAvailablePorts();
+        this.ev3.setPossibleValues(available);
 
         // display the first of the newly found bricks in
         // the Settings-UI
-        if (search && (this.nxt.getPossibleValues().length > 1)) {
-            this.nxt.setValue(this.nxt.getPossibleValues()[1]);
+        if (search && (this.ev3.getPossibleValues().length > 1)) {
+            this.ev3.setValue(this.ev3.getPossibleValues()[1]);
         }
     }
 
@@ -186,7 +177,7 @@ public class Settings extends PluginSettings {
         this.updateBrickList(null, false);
 
         PropertySet<Property<?>> ps = new PropertySet<Property<?>>();
-        ps.add(this.nxt);
+        ps.add(this.ev3);
         for (DefaultEnumProperty<SensorType> sensorType : this.sensorTypes.values()) {
             ps.add(sensorType);
         }
@@ -250,23 +241,23 @@ public class Settings extends PluginSettings {
 
                 @SuppressWarnings("unchecked")
                 @Override
-                protected void end(String name)
-                        throws SAXException {
-
-                    try {
-                        BrickDescription desc
-                                = (BrickDescription) this.factory.getConstructor(
-                                        new Class[]{String.class, NxtDeviceInfo.class,
-                                            InterfaceType.class, String.class}).newInstance(
-                                                new Object[]{this.uri,
-                                                    new NxtDeviceInfo(this.brickName, null, null, 0, 0, 0),
-                                                    this.type,
-                                                    this.port});
-                        Settings.this.addBrick(desc);
-                        Settings.this.nxt.setValue(desc);
-                    } catch (Exception exn) {
-                        r.raiseException(exn);
-                    }
+                protected void end(String name) throws SAXException {
+                    // TODO implement me
+//
+//                    try {
+//                        BrickDescription desc
+//                                = (BrickDescription) this.factory.getConstructor(
+//                                        new Class[]{String.class, NxtDeviceInfo.class,
+//                                            InterfaceType.class, String.class}).newInstance(
+//                                                new Object[]{this.uri,
+//                                                    new NxtDeviceInfo(this.brickName, null, null, 0, 0, 0),
+//                                                    this.type,
+//                                                    this.port});
+//                        Settings.this.addBrick(desc);
+//                        Settings.this.ev3.setValue(desc);
+//                    } catch (Exception exn) {
+//                        r.raiseException(exn);
+//                    }
                 }
             });
         } else if (name.equals("sensor")) {
@@ -312,8 +303,10 @@ public class Settings extends PluginSettings {
 
     @Override
     public void writeAttributes(XMLWriter out, IdMap uidMap) {
+        // TODO implement me
 
-        BrickDescription nxt = this.nxt.getValue();
+        /*
+        BrickDescription nxt = this.ev3.getValue();
         if ((nxt != null) && (nxt.getInterfaceType() != null)) {
             Graph.printAtt(out, "nxt", "nxt", null);
             Graph.printAtt(out, "factory", nxt.getClass().getName());
@@ -333,6 +326,7 @@ public class Settings extends PluginSettings {
             }
             out.closeElement("att");
         }
+*/
     }
 
     public SensorType getSensorType(Sensor.Port port) {
@@ -340,22 +334,19 @@ public class Settings extends PluginSettings {
         return this.sensorTypes.get(port).getValue();
     }
 
-    public Ev3 createBrick(Component parent)
-            throws IOException, UserCanceledException {
+    public EV3 createBrick(Component parent) throws IOException, UserCanceledException {
 
-        if (this.nxt.getValue() != null) {
-            return this.nxt.getValue().createBrick(parent);
+        if (this.ev3.getValue() != null) {
+            return this.ev3.getValue().instantiate();
         } else {
             return null;
         }
     }
 
     @Override
-    public NxtRuntime createRuntime(Component parent)
-            throws Exception {
+    public NxtRuntime createRuntime(Component parent) throws Exception {
 
-        Map<Sensor.Port, SensorType> sensorTypes
-                = new HashMap<Sensor.Port, SensorType>();
+        Map<Sensor.Port, SensorType> sensorTypes = new HashMap<Sensor.Port, SensorType>();
         for (Sensor.Port port : this.sensorTypes.keySet()) {
             sensorTypes.put(port, this.getSensorType(port));
         }

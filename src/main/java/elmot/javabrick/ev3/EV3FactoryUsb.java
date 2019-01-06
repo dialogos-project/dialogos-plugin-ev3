@@ -34,8 +34,6 @@ public class EV3FactoryUsb {
             for (UsbDevice device : (List<UsbDevice>) hub.getAttachedUsbDevices()) {
                 UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();
                 if (desc.idVendor() == Ev3Constants.EV3_USB_VENDOR_ID && desc.idProduct() == Ev3Constants.EV3_USB_PRODUCT_ID) {
-                    System.err.println(makeUsbLocation(device));
-                    
                     UsbInterface usbInterface = device.getActiveUsbConfiguration().getUsbInterface((byte) 0);
                     String port = makeUsbLocation(device);
                     portsToInterfaces.put(port, usbInterface);
@@ -92,18 +90,5 @@ public class EV3FactoryUsb {
             throw new RuntimeException(e);
         }
         return ev3s;
-    }
-
-    public static void main(String[] args) throws IOException {
-        List<EV3> ev3s = null;
-        ev3s = EV3FactoryUsb.listDiscovered();
-        EV3 ev3 = ev3s.get(0);
-
-        float vBatt = ev3.SYSTEM.getVBatt();
-        float iBatt = ev3.SYSTEM.getIBatt();
-        System.out.println("v/i Batt = " + vBatt + "/" + iBatt);
-
-        //ev3.SYSTEM.playTone(30, 800, 400);
-//        ev3.SYSTEM.
     }
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import com.clt.dialogos.plugin.PluginRuntime;
 import com.clt.lego.ev3.Sensor;
 import com.clt.lego.ev3.Ev3;
+import elmot.javabrick.ev3.EV3;
 
 /**
  * @author dabo
@@ -13,10 +14,10 @@ import com.clt.lego.ev3.Ev3;
  */
 public class NxtRuntime implements PluginRuntime {
 
-    private Ev3 brick;
+    private EV3 brick;
     private Map<Sensor.Port, SensorType> sensorTypes;
 
-    public NxtRuntime(Ev3 brick, Map<Sensor.Port, SensorType> sensorTypes) {
+    public NxtRuntime(EV3 brick, Map<Sensor.Port, SensorType> sensorTypes) {
 
         this.brick = brick;
         this.sensorTypes = sensorTypes;
@@ -53,7 +54,9 @@ public class NxtRuntime implements PluginRuntime {
         if (this.brick == null) {
             return 0;
         } else {
-            return this.brick.keepAlive();
+            // TODO implement me
+            return 0;
+//            return this.brick.keepAlive();
         }
     }
 
@@ -69,7 +72,7 @@ public class NxtRuntime implements PluginRuntime {
         }
     }
 
-    public Ev3 getBrick() {
+    public EV3 getBrick() {
 
         return this.brick;
     }

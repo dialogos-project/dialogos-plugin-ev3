@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 import org.xml.sax.SAXException;
 
-import com.clt.dialogos.lego.ev3.Node;
+import com.clt.dialogos.lego.ev3.Ev3Node;
 import com.clt.dialogos.lego.ev3.NxtRuntime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
@@ -26,7 +26,7 @@ import com.clt.xml.XMLWriter;
  * @author dabo
  *
  */
-public class StopProgramNode extends Node {
+public class StopProgramNode extends Ev3Node {
 
     private static final String CHECK_RUNNING = "checkRunning";
 
@@ -68,14 +68,17 @@ public class StopProgramNode extends Node {
     }
 
     @Override
-    protected int executeNXT(WozInterface comm) {
+    protected int executeEv3(WozInterface comm) {
 
         try {
-            NxtRuntime runtime
-                    = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
             if (runtime.getBrick() == null) {
                 throw new ExecutionException(Resources.getString("NoNxtBrickSelected"));
             }
+            
+            // TODO implement me
+            
+            /*
             boolean stopped = runtime.getBrick().stopProgram();
             boolean check = this.getBooleanProperty(StopProgramNode.CHECK_RUNNING);
             if (!stopped && check) {
@@ -83,6 +86,9 @@ public class StopProgramNode extends Node {
             } else {
                 return 0;
             }
+*/
+            
+            return 0;
         } catch (Exception exn) {
             throw new NodeExecutionException(this, Resources
                     .getString("CouldNotStopProgram"), exn);

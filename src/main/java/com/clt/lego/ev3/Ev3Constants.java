@@ -6,6 +6,8 @@ package com.clt.lego.ev3;
  * @author koller
  */
 public class Ev3Constants {
+    public static final int EV3_USB_VENDOR_ID = 0x0694;
+    public static final int EV3_USB_PRODUCT_ID = 0x0005;
 
     public static final byte SYSTEM_COMMAND_REPLY = (byte) 0x01;
     public static final byte SYSTEM_COMMAND_NO_REPLY = (byte) 0x81;

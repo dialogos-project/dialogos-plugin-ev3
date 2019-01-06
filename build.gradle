@@ -20,8 +20,8 @@ dependencies {
   implementation group: "org.usb4java", name: "usb4java-javax", version: "1.2.0"
 }
 
-//mainClassName = 'com.clt.dialogos.DialogOS'
-mainClassName = 'com.clt.lego.ev3.Ev3Usb'
+mainClassName = 'com.clt.dialogos.DialogOS'
+//mainClassName = 'com.clt.lego.ev3.Ev3Usb'
 
 def version = '2.0.1'  // DO NOT EDIT - THIS IS CHANGED BY THE RELEASE SCRIPT
 def group = 'com.github.dialogos-project'

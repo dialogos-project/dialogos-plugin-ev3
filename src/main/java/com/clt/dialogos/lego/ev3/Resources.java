@@ -10,7 +10,7 @@ import com.clt.util.StringTools;
 public class Resources {
 
     private static DynamicResourceBundle resources
-            = new DynamicResourceBundle("com.clt.dialogos.lego.nxt.Resource", null, Resources.class.getClassLoader());
+            = new DynamicResourceBundle("com.clt.dialogos.lego.ev3.Resource", null, Resources.class.getClassLoader());
 
     public static String getString(String key) {
 

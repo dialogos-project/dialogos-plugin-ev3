@@ -1,5 +1,9 @@
 package com.clt.lego.ev3;
 
+import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.EV3FactoryUsb;
+import elmot.javabrick.ev3.MotorFactory;
+import elmot.javabrick.ev3.PORT;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -46,7 +50,7 @@ public class Ev3 {
         comm.send(buf.array());
 
         // receive response
-        byte[] msgLenResponse = comm.readResponse(2); // read message length of reply
+        byte[] msgLenResponse = comm.read(2); // read message length of reply
         System.err.println("\nmsglen response:");
         hexdump(msgLenResponse);
         
@@ -54,7 +58,7 @@ public class Ev3 {
         bbMsgLen.order(ByteOrder.LITTLE_ENDIAN);
         int responseLength = bbMsgLen.getShort();
         
-        byte[] response = comm.readResponse(responseLength);
+        byte[] response = comm.read(responseLength);
         System.err.println("response:");
         hexdump(response);
         
@@ -106,7 +110,13 @@ public class Ev3 {
         
         
         // receive response
-        byte[] msgLenResponse = comm.readResponse(4); // read message length of reply
+        
+        
+        
+        
+        byte[] msgLenResponse = comm.read(4); // read message length of reply
+        System.exit(0);
+        
         System.err.println("\nmsglen response:");
         hexdump(msgLenResponse);
         
@@ -115,7 +125,7 @@ public class Ev3 {
         int ff55 = bbMsgLen.getShort(); // skip these (Bluetooth only?) - TODO check this
         int responseLength = bbMsgLen.getShort();
         
-        byte[] response = comm.readResponse(responseLength);
+        byte[] response = comm.read(responseLength);
         System.err.println("response:");
         hexdump(response);
         
@@ -160,25 +170,10 @@ public class Ev3 {
         byte[] cmd  = split("0x0F 0x00 0x00 0x00 0x80 0x00 0x00 0x94 0x01 0x81 0x32 0x82 0x0B 0x02 0x82 0xF4 0x01");
         comm.send(cmd);
         
-        byte[] resp = comm.readResponse(8);
+        byte[] resp = comm.read(8);
         
     }
     
-    
-    public static void main(String[] args) throws IOException {
-//        byte[] x = new byte[] { (byte) 'A', (byte) 'B' };
-//        hexdump(x);
-//        System.exit(0);
-        
-        
-        CommInterface comm = new BluetoothCommInterface();
-        Ev3 ev3 = new Ev3(comm);
-        
-        ev3.test();
-//        ev3.getInfo();
-        
-        //ev3.listFiles();
-    }
 
     public long keepAlive() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -250,5 +245,41 @@ public class Ev3 {
 
     Sensor.Mode getSensorMode(int id) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    
+    
+    public static void main(String[] args) throws IOException, InterruptedException {
+        List<EV3> ev3s = EV3FactoryUsb.listDiscovered();
+        EV3 ev3 = ev3s.get(0);
+        
+//        System.out.println(ev3.getPort());
+        
+//        ev3.SYSTEM.playTone(50, 400, 1000);
+        
+        System.out.println(ev3.TOUCH.getTouch(0, PORT.P1));
+
+        ev3.MOTOR.direction(MotorFactory.MOTORSET.A, MotorFactory.DIR.FORWARD);
+        ev3.MOTOR.speed(MotorFactory.MOTORSET.A, 50);
+        
+        ev3.MOTOR.start(MotorFactory.MOTORSET.A);
+        
+        Thread.sleep(1000);
+        
+        ev3.MOTOR.stop(MotorFactory.MOTORSET.A, MotorFactory.BRAKE.BRAKE);
+        
+        
+//        
+//        //CommInterface comm = new BluetoothCommInterface();
+//        List<String> availablePorts = UsbCommInterface.getAvailablePorts();
+//        String port = availablePorts.get(0);
+//        CommInterface comm = new UsbCommInterface(port);
+//        
+//        Ev3 ev3 = new Ev3(comm);
+//        
+//        //ev3.test();  // works on Win/USB
+//        ev3.getInfo();
+//        
+        //ev3.listFiles();
     }
 }

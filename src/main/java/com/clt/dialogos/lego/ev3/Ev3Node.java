@@ -18,11 +18,11 @@ import com.clt.xml.XMLWriter;
  * @author Daniel Bobbert
  *
  */
-public abstract class Node extends com.clt.diamant.graph.Node {
+public abstract class Ev3Node extends com.clt.diamant.graph.Node {
 
     private static final boolean LEGO_NODE_UI = false;
 
-    public Node() {
+    public Ev3Node() {
         super();
     }
 
@@ -39,15 +39,15 @@ public abstract class Node extends com.clt.diamant.graph.Node {
 
     @Override
     public com.clt.diamant.graph.Node execute(WozInterface comm, InputCenter input, ExecutionLogger logger) {
-        int edge = this.executeNXT(comm);
+        int edge = this.executeEv3(comm);
         return this.getEdge(edge).getTarget();
     }
 
-    protected abstract int executeNXT(WozInterface comm);
+    protected abstract int executeEv3(WozInterface comm);
 
     @Override
     public UIElement createUI(GraphUI graphUI, MouseInputListener viewScroller) {
-        if (Node.LEGO_NODE_UI) {
+        if (Ev3Node.LEGO_NODE_UI) {
             return new LegoNodeUI(graphUI, this, viewScroller);
         } else {
             return super.createUI(graphUI, viewScroller);
