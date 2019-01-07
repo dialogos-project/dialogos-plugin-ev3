@@ -1,5 +1,6 @@
 package com.clt.lego.ev3;
 
+import elmot.javabrick.ev3.Ev3Constants;
 import elmot.javabrick.ev3.EV3;
 import elmot.javabrick.ev3.EV3FactoryUsb;
 import elmot.javabrick.ev3.MotorFactory;

@@ -1,6 +1,5 @@
 package elmot.javabrick.ev3.impl;
 
-import com.clt.lego.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
@@ -38,10 +37,14 @@ public class CommandBlock {
         }
         commands.add(command);
     }
+    
+    public static int getNextSeqCounter() {
+        return seqCounter.incrementAndGet() & 0x7fff;
+    }
 
     public Response run(EV3 brick, Class<?>... outParametersTypes) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN);
-        int seqNumber = seqCounter.incrementAndGet() & 0x7fff;
+        int seqNumber = getNextSeqCounter();
         buffer.putShort(2, (short) seqNumber);
         buffer.put(4, commandType);
         buffer.position(7);

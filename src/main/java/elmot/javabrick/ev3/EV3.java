@@ -23,6 +23,7 @@ public abstract class EV3 implements AutoCloseable {
     public final HTIRSeeker HT_IR_SEEKER;
     public final GyroSensorFactory GYRO;
     public final HTAngleSensor HT_ANGLE;
+    public final FileSystem FILE;
 
     public final SystemFactory SYSTEM;
 
@@ -40,6 +41,7 @@ public abstract class EV3 implements AutoCloseable {
         HT_ANGLE = new HTAngleSensor(this);
         HT_IR_SEEKER = new HTIRSeeker(this);
         GYRO = new GyroSensorFactory(this);
+        FILE = new FileSystem(this);
     }
 
     public abstract void ensureOpen() throws IOException;

@@ -1,4 +1,4 @@
-package com.clt.lego.ev3;
+package elmot.javabrick.ev3;
 
 /**
  * Constants for EV3 commands and responses.

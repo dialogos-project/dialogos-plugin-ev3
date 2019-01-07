@@ -5,6 +5,7 @@
  */
 package com.clt.lego.ev3;
 
+import elmot.javabrick.ev3.Ev3Constants;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;

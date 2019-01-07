@@ -11,6 +11,7 @@ import java.util.List;
  * @author elmot
  */
 public class Command {
+
     public static final int PRAMETER_TYPE_VARIABLE = 0x40;
     public static final int VARIABLE_SCOPE_GLOBAL = 0x20;
     private final int byteCode;
@@ -36,7 +37,7 @@ public class Command {
     }
 
     public void writeTo(ByteBuffer buffer) throws IOException {
-        buffer.put((byte)byteCode);
+        buffer.put((byte) byteCode);
         for (byte[] param : params) {
             buffer.put(param);
         }
@@ -68,13 +69,13 @@ public class Command {
     public void addIntConstantParam(int val) {
         addIntFourBytes(val, (byte) 0);
     }
-    
+
     public void addShort(int val) {
-        params.add(new byte[] { (byte) (val & 255), (byte) (val >> 8) });
+        params.add(new byte[]{(byte) (val & 255), (byte) (val >> 8)});
     }
-    
+
     public void addString(String val) {
-        ByteBuffer buf = ByteBuffer.allocate(val.length()+1);
+        ByteBuffer buf = ByteBuffer.allocate(val.length() + 1);
         buf.put(val.getBytes(StandardCharsets.ISO_8859_1));
         buf.put((byte) 0);
         params.add(buf.array());

@@ -1,6 +1,5 @@
 package elmot.javabrick.ev3;
 
-import com.clt.lego.ev3.Ev3Constants;
 import com.clt.lego.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.impl.EV3Usb;
 import java.io.IOException;
