@@ -36,6 +36,8 @@ import com.clt.util.StringTools;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.FileSystem;
+import java.util.List;
 
 /**
  * @author dabo
@@ -94,32 +96,28 @@ public class ProgramNode extends Ev3Node {
                                     String[] programs = null;
                                     EV3 brick = settings.createBrick(p);
                                     
-                                    // TODO implement me
-                                    
-                                    return new String[0];
-                                    
-                                    /*
-                                    if (brick != null) {
-                                        try {
-                                            programs = brick.getPrograms();
-                                        } finally {
-                                            brick.close();
-                                        }
+                                    if( brick == null ) {
+                                        throw new Exception(Resources.getString("NoNxtBrickSelected"));
                                     }
+                                    
+                                    List<FileSystem.Ev3File> files = brick.FILE.findFiles(FileSystem.PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
+                                    programs = new String[files.size()];
+                                    int i = 0;
+                                    for( FileSystem.Ev3File f : files ) {
+                                        programs[i++] = f.getRelativePathname();
+                                    }
+                                    
                                     return programs;
-*/
                                 }
                             });
 
                     if (programs == null) {
-                        OptionPane
-                                .error(p, Resources.getString("NoNxtBrickSelected") + ".");
+                        OptionPane.error(p, Resources.getString("NoNxtBrickSelected") + ".");
                     } else {
                         if (programs.length == 0) {
                             OptionPane.message(p, Resources.getString("NoProgramsOnBrick"));
                         } else {
-                            String program
-                                    = new ListSelectionDialog<String>(p,
+                            String program = new ListSelectionDialog<String>(p,
                                             Resources.getString("ChooseProgram"), null,
                                             programs).getSelectedItem();
                             if (program != null) {

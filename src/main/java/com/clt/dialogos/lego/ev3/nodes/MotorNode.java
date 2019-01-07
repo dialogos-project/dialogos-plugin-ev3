@@ -197,9 +197,7 @@ public class MotorNode extends Ev3Node {
                 r.raiseException(Resources.format("UnknownMotor", value));
             }
         } else if (name.equals(MotorNode.STATE)) {
-            System.err.println("decode state " + value);
             State state = State.valueOf(value);
-            System.err.println("to: " + state);
             setProperty(STATE, state);
 
             if (this.getProperty(MotorNode.STATE) == null) {
