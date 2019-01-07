@@ -6,8 +6,10 @@
 package elmot.javabrick.ev3;
 
 import com.clt.lego.ev3.Ev3Descriptor;
+import elmot.javabrick.ev3.impl.Command;
 import elmot.javabrick.ev3.impl.CommandBlock;
-import java.io.FileWriter;
+import elmot.javabrick.ev3.impl.FactoryBase;
+import elmot.javabrick.ev3.impl.Response;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
@@ -16,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,15 +27,13 @@ import java.util.regex.Pattern;
  *
  * @author Alexander
  */
-public class FileSystem {
-
-    private EV3 ev3;
+public class FileSystem extends FactoryBase {
 
     public FileSystem(EV3 ev3) {
-        this.ev3 = ev3;
+        super(ev3);
     }
 
-    private static final int CHUNKSIZE = 1012;
+    private static final int CHUNKSIZE = 1000;
 
     private static List<String> decodeResponses(ByteBuffer buf, int length, char separator) {
         byte[] arr = buf.array();
@@ -91,7 +93,7 @@ public class FileSystem {
         cmd.putShort((short) cmd.limit());             // bytes 0-1: overwrite with actual message length
         cmd.rewind();
 
-        ByteBuffer response = ev3.dataExchange(cmd, messageSeqNumber);
+        ByteBuffer response = brick.dataExchange(cmd, messageSeqNumber);
 
         // process response
         response.rewind();
@@ -127,7 +129,7 @@ public class FileSystem {
             cmd.putShort((short) cmd.limit());             // bytes 0-1: overwrite with actual message length
             cmd.rewind();
 
-            response = ev3.dataExchange(cmd, messageSeqNumber);
+            response = brick.dataExchange(cmd, messageSeqNumber);
             response.rewind();
             response.position(8); // skip headers
 
@@ -147,7 +149,7 @@ public class FileSystem {
             }
         }
     }
-    
+
     public static final String PROJECT_ROOT = "/home/root/lms2012/prjs/";
 
     public static class Ev3File {
@@ -175,6 +177,10 @@ public class FileSystem {
             }
         }
 
+        public static String makeFilenameRelativeToProjectRoot(String relativeFilename) {
+            return PROJECT_ROOT + relativeFilename;
+        }
+
         public String getMd5() {
             return md5;
         }
@@ -195,11 +201,11 @@ public class FileSystem {
         public String toString() {
             return getContainingDirectory() + getName();
         }
-        
+
         public String getRelativePathname() {
             String absoluteName = getContainingDirectory() + getName();
-            
-            if( absoluteName.startsWith(PROJECT_ROOT) ) {
+
+            if (absoluteName.startsWith(PROJECT_ROOT)) {
                 return absoluteName.substring(PROJECT_ROOT.length());
             } else {
                 return absoluteName;
@@ -252,7 +258,7 @@ public class FileSystem {
 
         forEachFileInSubtree(directory, file -> {
             System.err.printf("%s -> %b\n", file.toString(), filter.test(file));
-            
+
             if (filter.test(file)) {
                 files.add(file);
             }
@@ -261,22 +267,87 @@ public class FileSystem {
         return files;
     }
 
-    public static void main(String[] args) throws IOException {
+    public void startProgram(String absoluteFilename) throws IOException {
+        Command command = new Command(Ev3Constants.opFILE);
+        command.addByte(Ev3Constants.LOAD_IMAGE);
+        command.addLCX(1);                      // slot
+        command.addLCS(absoluteFilename);       // name
+        command.addLVX(0);                      // size
+        command.addLVX(4);                      // IP*
+
+        command.addByte(Ev3Constants.opPROGRAM_START);
+        command.addLCX(1);                      // slot
+        command.addLVX(0);                      // size
+        command.addLVX(4);                      // IP*
+        command.addLCX(0);                      // debug
+
+        run(command);
+    }
+
+    /**
+     * Stop the currently running program.
+     *
+     * @throws IOException
+     */
+    public void stopProgram() throws IOException {
+        Command command = new Command(Ev3Constants.opPROGRAM_STOP);
+        command.addLCX(1);                      // slot
+
+        run(command);
+    }
+
+    /**
+     * Checks if the program is currently running. Return values: 0 = OK
+     * (terminated); 1 = BUSY (running).
+     *
+     * @return
+     * @throws IOException
+     */
+    public byte checkStatus() throws IOException {
+        Command command = new Command(Ev3Constants.opPROGRAM_INFO, 1);
+        command.addByte(Ev3Constants.GET_PRGRESULT);
+        command.addLCX(1);
+        command.addShortGlobalVariable(0);
+
+        Response resp = run(command, Byte.class);
+        return resp.getByte(0);
+    }
+
+    public void waitUntilProgramTermination() throws IOException {
+        byte status = 1;
+
+        while (status == 1) {
+            status = brick.FILE.checkStatus();
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException ex) {
+            }
+        }
+    }
+
+    public static void main(String[] args) throws IOException, InterruptedException {
         Ev3Descriptor.discoverAll();
         List<Ev3Descriptor> availableBricks = Ev3Descriptor.getAllDescriptors();
         EV3 brick = availableBricks.get(0).instantiate();
 
-        List<Ev3File> programs = brick.FILE.findFiles(PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
-        
-        for( Ev3File pr : programs ) {
-            System.out.println(pr.getRelativePathname());
+//        List<Ev3File> files = brick.FILE.findFiles(PROJECT_ROOT, file -> true);
+//        System.err.println(files);
+//        System.exit(0);
+        String absoluteFilename = Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf");
+
+        brick.FILE.startProgram(absoluteFilename);
+
+        byte status = 1;
+        while (status > 0) {
+            long startTime = System.nanoTime();
+            status = brick.FILE.checkStatus();
+            long endTime = System.nanoTime();
+            System.err.println("checkStatus took " + (endTime-startTime)/1000000.0 + " ms");
+            
+            System.err.println("still running");
+            Thread.sleep(200);
         }
 
-//        PrintWriter pw = new PrintWriter(new FileWriter("files.txt"));
-//        exploreFileTree(brick, "/home/", pw);
-//        pw.flush();
-//        pw.close();
-//        List<String> files = brick.FILE.listFiles("/");
-//        System.out.println(files);
+        brick.FILE.stopProgram();
     }
 }

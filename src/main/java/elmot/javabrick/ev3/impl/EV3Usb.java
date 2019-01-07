@@ -49,7 +49,7 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
                 command.get(dataBlock, 0, command.limit());
                 
 //                System.err.println("\nsend:");  // AKAKAK
-//                Ev3.hexdump(dataBlock);
+//                Ev3.hexdump(dataBlock, 100);
                 
                 try {
                     pipeOut.syncSubmit(dataBlock);
@@ -64,10 +64,10 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
                         int length = 2 + (0xff & (int) dataBlock[0]) + (dataBlock[1] << 8);
                         
                         // Do we need this? Let's comment out for now. - AK
-//                        if (length < 3 || length > 1022) {
-//                            LOGGER.warning("Garbage in USB queue - skipping");
-//                            continue;
-//                        }
+                        if (length < 3 || length > 1022) {
+                            LOGGER.warning("Garbage in USB queue - skipping");
+                            continue;
+                        }
                         
                         ByteBuffer response = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);                        
                         response.put(dataBlock, 0, length);
@@ -76,8 +76,10 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
 //                        Ev3.hexdump(dataBlock);
                         
                         int readSeqNo = response.getShort(2);
-                        if (readSeqNo < expectedSeqNo) {
+                        if (readSeqNo != expectedSeqNo) {
                             LOGGER.warning("Resynch EV3 seq no");
+//                            Ev3.hexdump(dataBlock, 100);
+//                            System.err.println();
                             continue;
                         }
                         

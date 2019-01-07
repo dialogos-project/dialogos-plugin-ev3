@@ -12,12 +12,12 @@ import elmot.javabrick.ev3.EV3;
  * @author dabo
  *
  */
-public class NxtRuntime implements PluginRuntime {
+public class Ev3Runtime implements PluginRuntime {
 
     private EV3 brick;
     private Map<Sensor.Port, SensorType> sensorTypes;
 
-    public NxtRuntime(EV3 brick, Map<Sensor.Port, SensorType> sensorTypes) {
+    public Ev3Runtime(EV3 brick, Map<Sensor.Port, SensorType> sensorTypes) {
 
         this.brick = brick;
         this.sensorTypes = sensorTypes;
@@ -28,7 +28,7 @@ public class NxtRuntime implements PluginRuntime {
                 public void run() {
 
                     try {
-                        long delay = NxtRuntime.this.keepAlive();
+                        long delay = Ev3Runtime.this.keepAlive();
                         while (delay != 0) {
                             // ping the brick 10s before it wants to sleep
                             if (delay < 0) {
@@ -36,7 +36,7 @@ public class NxtRuntime implements PluginRuntime {
                             } else {
                                 Thread.sleep(delay - 10000);
                             }
-                            delay = NxtRuntime.this.keepAlive();
+                            delay = Ev3Runtime.this.keepAlive();
                         }
                     } catch (Exception exn) {
                         // ignore

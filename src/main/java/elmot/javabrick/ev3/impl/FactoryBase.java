@@ -10,6 +10,8 @@ import java.io.IOException;
 public class FactoryBase {
     public static final int DIRECT_REPLY = 2;
     private static final int SYSTEM_REPLY = 3;
+    private static final int DIRECT_ERROR = 4;
+    
     protected final EV3 brick;
 
     protected FactoryBase(EV3 brick) {
@@ -20,10 +22,15 @@ public class FactoryBase {
         return brick.run(commandBlock, responseClasses);
     }
 
-    protected Response run(Command command, Class<?>... responseClasses) throws IOException {
+    protected Response run(Command command, Class<?>... responseClasses) throws IOException, DirectCommandException {
         CommandBlock commandBlock = new CommandBlock(command);
         Response run = brick.run(commandBlock, responseClasses);
         int statusCode = run.getStatusCode();
+        
+        if( statusCode == DIRECT_ERROR ) {
+            throw new DirectCommandException();
+        }
+        
         if (statusCode != DIRECT_REPLY && statusCode != SYSTEM_REPLY) {
             System.err.println("Unexpected reply status:" + statusCode);
         }
@@ -32,4 +39,7 @@ public class FactoryBase {
     }
 
 
+    public static class DirectCommandException extends RuntimeException {
+        
+    }
 }

@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import org.xml.sax.SAXException;
 
 import com.clt.dialogos.lego.ev3.Ev3Node;
-import com.clt.dialogos.lego.ev3.NxtRuntime;
+import com.clt.dialogos.lego.ev3.Ev3Runtime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
 import com.clt.diamant.IdMap;
@@ -71,27 +71,25 @@ public class StopProgramNode extends Ev3Node {
     protected int executeEv3(WozInterface comm) {
 
         try {
-            NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            Ev3Runtime runtime = (Ev3Runtime) this.getPluginRuntime(Plugin.class, comm);
             if (runtime.getBrick() == null) {
                 throw new ExecutionException(Resources.getString("NoNxtBrickSelected"));
             }
             
-            // TODO implement me
+            runtime.getBrick().FILE.stopProgram();
             
-            /*
-            boolean stopped = runtime.getBrick().stopProgram();
             boolean check = this.getBooleanProperty(StopProgramNode.CHECK_RUNNING);
-            if (!stopped && check) {
-                return 1;
-            } else {
-                return 0;
+            
+            if( check ) {
+                byte status = runtime.getBrick().FILE.checkStatus();
+                if( status == 1 ) { // still busy
+                    return 1;
+                }
             }
-*/
             
             return 0;
         } catch (Exception exn) {
-            throw new NodeExecutionException(this, Resources
-                    .getString("CouldNotStopProgram"), exn);
+            throw new NodeExecutionException(this, Resources.getString("CouldNotStopProgram"), exn);
         }
     }
 

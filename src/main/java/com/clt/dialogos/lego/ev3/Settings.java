@@ -344,12 +344,12 @@ public class Settings extends PluginSettings {
     }
 
     @Override
-    public NxtRuntime createRuntime(Component parent) throws Exception {
+    public Ev3Runtime createRuntime(Component parent) throws Exception {
 
         Map<Sensor.Port, SensorType> sensorTypes = new HashMap<Sensor.Port, SensorType>();
         for (Sensor.Port port : this.sensorTypes.keySet()) {
             sensorTypes.put(port, this.getSensorType(port));
         }
-        return new NxtRuntime(this.createBrick(parent), sensorTypes);
+        return new Ev3Runtime(this.createBrick(parent), sensorTypes);
     }
 }

@@ -15,7 +15,7 @@ import javax.swing.text.JTextComponent;
 import org.xml.sax.SAXException;
 
 import com.clt.dialogos.lego.ev3.Ev3Node;
-import com.clt.dialogos.lego.ev3.NxtRuntime;
+import com.clt.dialogos.lego.ev3.Ev3Runtime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
 import com.clt.dialogos.lego.ev3.Settings;
@@ -157,25 +157,19 @@ public class ProgramNode extends Ev3Node {
         }
 
         try {
-            NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            Ev3Runtime runtime = (Ev3Runtime) this.getPluginRuntime(Plugin.class, comm);
             
             if (runtime.getBrick() == null) {
                 throw new ExecutionException(Resources.getString("NoNxtBrickSelected"));
             }
             
-            // TODO implement me
-            /*
-            runtime.getBrick().startProgram(program);
-
+            runtime.getBrick().FILE.startProgram(FileSystem.Ev3File.makeFilenameRelativeToProjectRoot(program));
+            
             if (this.getBooleanProperty(ProgramNode.WAIT)) {
-                while (runtime.getBrick().getCurrentProgram() != null) {
-                    Thread.sleep(50);
-                }
-            }
-*/
+                runtime.getBrick().FILE.waitUntilProgramTermination();
+            }            
         } catch (Exception exn) {
-            throw new NodeExecutionException(this, Resources
-                    .getString("CouldNotStartProgram"), exn);
+            throw new NodeExecutionException(this, Resources.getString("CouldNotStartProgram"), exn);
         }
         return 0;
     }
@@ -187,8 +181,7 @@ public class ProgramNode extends Ev3Node {
 
         String program = (String) this.getProperty(ProgramNode.PROGRAM_NAME);
         if (StringTools.isEmpty(program)) {
-            this.reportError(errors, false, Resources
-                    .getString("NoNxtProgramSelected"));
+            this.reportError(errors, false, Resources.getString("NoNxtProgramSelected"));
         }
     }
 

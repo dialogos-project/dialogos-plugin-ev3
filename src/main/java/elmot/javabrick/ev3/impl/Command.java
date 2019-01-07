@@ -2,7 +2,6 @@ package elmot.javabrick.ev3.impl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +11,9 @@ import java.util.List;
  */
 public class Command {
 
-    public static final int PRAMETER_TYPE_VARIABLE = 0x40;
-    public static final int VARIABLE_SCOPE_GLOBAL = 0x20;
+    private static final byte PARAMETER_TYPE_VARIABLE = (byte) 0x40;
+    private static final byte VARIABLE_SCOPE_GLOBAL = (byte) 0x20;
+    
     private final int byteCode;
     private final int replyByteCount;
 
@@ -52,9 +52,12 @@ public class Command {
         params.add(new byte[]{(byte) 0x81, (byte) val});
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     public void addLongTwoBytes(int val) {
         params.add(new byte[]{(byte) 0x82, (byte) val, (byte) (val >> 8)});
+    }
+    
+    public void addLC2(short val) {
+        addLongTwoBytes(byteCode);
     }
 
     public void addIntFourBytes(int val, byte modifiers) {
@@ -62,14 +65,68 @@ public class Command {
     }
 
     public void addShortGlobalVariable(int val) {
-        byte b = (byte) (PRAMETER_TYPE_VARIABLE | VARIABLE_SCOPE_GLOBAL | (val & 0x1f));
+        byte b = (byte) (PARAMETER_TYPE_VARIABLE | VARIABLE_SCOPE_GLOBAL | (val & 0x1f));
         addByte(b);
     }
 
     public void addIntConstantParam(int val) {
         addIntFourBytes(val, (byte) 0);
     }
+    
+    public void addLCX(int value) {
+        if( value < 0 ) {
+            throw new UnsupportedOperationException("Currently only non-negative constants are supported.");
+        }
+        
+        if( value < 32 ) {
+            addByte(value); // LC0
+        } else if( value < 128 ) {
+            addLongOneByte(value); // LC1            
+        } else if( value < 32768 ) {
+            addLongTwoBytes(value); // LC2
+        } else {
+            addIntFourBytes(value, (byte) 0); // LC4
+        }
+    }
+    
+    public void addLCS(String s) {
+        byte[] data = new byte[s.length()+2];
+        data[0] = (byte) 0x84;
+        System.arraycopy(s.getBytes(), 0, data, 1, s.length());
+        data[data.length-1] = 0;
+        
+        params.add(data);
+    }
+    
+    public void addLV0(byte value) {
+        addByte(PARAMETER_TYPE_VARIABLE | value);
+    }
+    
+    public void addLV1(byte value) {
+        params.add(new byte[] { (byte) 0xC1, value });
+    }
+    
+    public void addLV2(short value) {
+        params.add(new byte[] { (byte) 0xC2, (byte) (value & 255), (byte) (value >>8) });
+    }
+    
+    public void addLV4(int value) {
+        throw new UnsupportedOperationException("Not implemented yet."); // TODO implement
+    }
+    
+    public void addLVX(int value) {
+        if( value < 32 ) {
+            addLV0((byte) value);
+        } else if( value < 256 ) {
+            addLV1((byte) value);
+        } else if( value < 65536 ) {
+            addLV2((short) value);
+        } else {
+            addLV4(value);
+        }
+    }
 
+    /*
     public void addShort(int val) {
         params.add(new byte[]{(byte) (val & 255), (byte) (val >> 8)});
     }
@@ -80,4 +137,5 @@ public class Command {
         buf.put((byte) 0);
         params.add(buf.array());
     }
+*/
 }

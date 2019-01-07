@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import org.xml.sax.SAXException;
 
 import com.clt.dialogos.lego.ev3.Ev3Node;
-import com.clt.dialogos.lego.ev3.NxtRuntime;
+import com.clt.dialogos.lego.ev3.Ev3Runtime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
 import com.clt.dialogos.lego.ev3.SensorType;
@@ -172,7 +172,7 @@ public class ReadSensorNode extends Ev3Node {
     protected int executeEv3(WozInterface comm) {
 
         try {
-            NxtRuntime runtime = (NxtRuntime) this.getPluginRuntime(Plugin.class, comm);
+            Ev3Runtime runtime = (Ev3Runtime) this.getPluginRuntime(Plugin.class, comm);
             EV3 brick = runtime.getBrick();
             
             

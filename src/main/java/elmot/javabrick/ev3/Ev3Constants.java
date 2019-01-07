@@ -49,6 +49,15 @@ public class Ev3Constants {
     public static final byte ILLEGAL_FILENAME = (byte) 0x0B;
     public static final byte ILLEGAL_CONNECTION = (byte) 0x0C;
     
-    // direct commands
+    // direct commands, see https://github.com/henkmollema/MindstormR/blob/master/src/MindstormR.MonoBrick/EV3/Commands.cs
     public static final byte opINFO = (byte) 0x7C; // GET_ID
+    public static final byte opFILE = (byte) 0xC0;
+    public static final byte opPROGRAM_START = (byte) 0x03;
+    public static final byte opPROGRAM_STOP = (byte) 0x02;
+    public static final byte opPROGRAM_INFO = (byte) 0x0c;
+    
+    public static final byte LOAD_IMAGE = (byte) 0x08;
+    public static final byte GET_STATUS = (byte) 0x16;
+    public static final byte GET_PRGRESULT = (byte) 0x18;
+    
 }

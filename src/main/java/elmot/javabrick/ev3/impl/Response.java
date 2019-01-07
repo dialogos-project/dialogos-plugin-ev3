@@ -38,7 +38,7 @@ public class Response {
         return ((Number) outParameters[index]).floatValue();
     }
 
-    public int getByte(int index) {
+    public byte getByte(int index) {
         return (Byte) outParameters[index];
     }
 }

@@ -139,11 +139,18 @@ public class Ev3 {
         return null;
     }
     
+    
+    
     public static void hexdump(byte[] data) {
-        int numRows = (data.length + 7) / 8;
+        hexdump(data, Integer.MAX_VALUE);
+    }
+    
+    public static void hexdump(byte[] data, int limit) {
+        int len = Math.min(data.length, limit);
+        int numRows = (len + 7) / 8;
                 
         for( int row = 0; row < numRows; row ++ ) {
-            int numCols = Math.min(8, data.length - 8*row);
+            int numCols = Math.min(8, len - 8*row);
             StringBuilder hexPart = new StringBuilder();
             StringBuilder chrPart = new StringBuilder();
             
