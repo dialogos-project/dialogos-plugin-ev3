@@ -182,7 +182,7 @@ public class Settings extends PluginSettings {
             ps.add(sensorType);
         }
 
-        p.add(ps.createPropertyPanel(false), BorderLayout.NORTH);
+        p.add(ps.createPropertyPanel(true), BorderLayout.NORTH);
 
         JButton update = new JButton(Resources.getString("FindBricks"));
         update.addActionListener(new ActionListener() {

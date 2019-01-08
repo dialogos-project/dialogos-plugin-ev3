@@ -5,7 +5,6 @@
  */
 package elmot.javabrick.ev3;
 
-import elmot.javabrick.ev3.EV3;
 import elmot.javabrick.ev3.usb.EV3FactoryUsb;
 import elmot.javabrick.ev3.bluetooth.Ev3FactoryBluetooth;
 import java.io.IOException;
@@ -20,7 +19,16 @@ import java.util.List;
 public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
     public static enum ConnectionTypes {
-        USB, BLUETOOTH, WIFI, DUMMY
+        USB("USB"), 
+        BLUETOOTH("Bluetooth"), 
+        WIFI("Wi-Fi"), 
+        DUMMY("Dummy");
+        
+        private String typestr;
+
+        private ConnectionTypes(String typestr) {
+            this.typestr = typestr;
+        }        
     }
     
     private ConnectionTypes connectionType;
@@ -66,7 +74,7 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
     @Override
     public String toString() {
-        return String.format("[%s] %s://%s", brickname, connectionType.toString().toLowerCase(), port);
+        return String.format("%s (%s)", brickname, connectionType.typestr);
     }
     
 
