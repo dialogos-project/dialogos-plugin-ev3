@@ -25,7 +25,7 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
     }
 
     @Override

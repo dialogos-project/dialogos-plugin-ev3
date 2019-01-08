@@ -53,7 +53,7 @@ public class Settings extends PluginSettings {
     private Map<Sensor.Port, DefaultEnumProperty<SensorType>> sensorTypes;
 
     static {
-        Settings.availablePorts.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.DUMMY, "--"));
+        Settings.availablePorts.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.DUMMY, "--", "--"));
     }
 
     @SuppressWarnings("unchecked")

@@ -11,6 +11,8 @@ import com.clt.util.Platform;
 import elmot.javabrick.ev3.impl.Ev3Bluetooth;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,9 +28,17 @@ public class Ev3FactoryBluetooth {
 
         for (String port : SerialPort.getAvailablePorts()) {
             if (isPortCandidate(port)) {
-                // TODO - check that this SerialPort actually has an EV3 connected
-                
-                descriptors.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.BLUETOOTH, port));
+                try {
+                    Ev3Bluetooth inst = new Ev3Bluetooth(port);
+                    String brickname = inst.SYSTEM.getBrickName();
+                    inst.close();
+                    
+                    if( brickname != null ) {
+                        descriptors.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.BLUETOOTH, port, brickname));
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(Ev3FactoryBluetooth.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
     }

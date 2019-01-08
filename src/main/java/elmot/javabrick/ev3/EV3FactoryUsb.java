@@ -2,6 +2,7 @@ package elmot.javabrick.ev3;
 
 import com.clt.lego.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.impl.EV3Usb;
+import java.io.IOException;
 
 import javax.usb.*;
 import java.net.SocketException;
@@ -32,14 +33,19 @@ public class EV3FactoryUsb {
                 UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();
                 if (desc.idVendor() == Ev3Constants.EV3_USB_VENDOR_ID && desc.idProduct() == Ev3Constants.EV3_USB_PRODUCT_ID) {
                     UsbInterface usbInterface = device.getActiveUsbConfiguration().getUsbInterface((byte) 0);
+                    
+                    EV3Usb inst = new EV3Usb(usbInterface);
+                    String brickname = inst.SYSTEM.getBrickName();
+                    inst.close();
+                    
                     String port = makeUsbLocation(device);
                     portsToInterfaces.put(port, usbInterface);
                     
-                    Ev3Descriptor descriptor = new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.USB, port);
+                    Ev3Descriptor descriptor = new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.USB, port, brickname);
                     descriptors.add(descriptor);
                 }
             }
-        } catch (UsbException | SecurityException ex) {
+        } catch (UsbException | SecurityException | IOException ex) {
             Logger.getLogger(EV3FactoryUsb.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

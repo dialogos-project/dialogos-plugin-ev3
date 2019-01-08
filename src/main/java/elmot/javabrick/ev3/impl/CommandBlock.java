@@ -2,6 +2,7 @@ package elmot.javabrick.ev3.impl;
 
 import com.clt.lego.ev3.Ev3;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.Util;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -69,11 +70,14 @@ public class CommandBlock {
         if (readSeqNo != seqNumber) {
             throw new IOException(String.format("Reponse had unexpected message ID: expected %d, got %d", seqNumber, readSeqNo));
         }
+        
+        
         int status = responseBytes.get(4);
         if (outParametersTypes != null) {
             Response response = new Response(outParametersTypes.length, status);
             for (int i = 0, index = 5; i < outParametersTypes.length; i++) {
                 Class<?> outParameterType = outParametersTypes[i];
+                
                 if (outParameterType == Integer.class || outParameterType == int.class) {
                     response.setOutParameter(i, responseBytes.getInt(index));
                     index += 4;
@@ -83,6 +87,10 @@ public class CommandBlock {
                 } else if (outParameterType == Byte.class || outParameterType == byte.class) {
                     response.setOutParameter(i, responseBytes.get(index));
                     index += 1;
+                } else if( outParameterType == String.class ) {
+                    String s = Util.readString(responseBytes, index, (char) 0);
+                    response.setOutParameter(i, s);
+                    index += s.length() + 1;
                 } else {
                     throw new IllegalArgumentException("OUT parameter of type " + outParameterType + " is not supported");
                 }

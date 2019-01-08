@@ -25,12 +25,14 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
     
     private ConnectionTypes connectionType;
     private String port;
+    private String brickname;
     
     private static List<Ev3Descriptor> allDescriptors = new ArrayList<>();
 
-    public Ev3Descriptor(ConnectionTypes connectionType, String port) {
+    public Ev3Descriptor(ConnectionTypes connectionType, String port, String brickname) {
         this.connectionType = connectionType;
         this.port = port;
+        this.brickname = brickname;
     }
 
     public ConnectionTypes getConnectionType() {
@@ -64,7 +66,7 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
     @Override
     public String toString() {
-        return String.format("%s://%s", connectionType.toString().toLowerCase(), port);
+        return String.format("[%s] %s://%s", brickname, connectionType.toString().toLowerCase(), port);
     }
     
 

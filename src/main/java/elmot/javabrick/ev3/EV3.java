@@ -47,7 +47,7 @@ public abstract class EV3 implements AutoCloseable {
     public abstract void ensureOpen() throws IOException;
 
     @Override
-    public abstract void close() throws Exception;
+    public abstract void close() throws IOException;
 
     public synchronized Response run(CommandBlock commandBlock, Class<?>[] commandParameters) throws IOException {
         ensureOpen();

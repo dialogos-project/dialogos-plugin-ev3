@@ -18,7 +18,6 @@ import java.nio.ByteOrder;
  * @author koller
  */
 public class Ev3Bluetooth extends EV3 {
-
     private final SerialPort serialPort;
 
     public Ev3Bluetooth(String port) throws IOException {
@@ -32,7 +31,7 @@ public class Ev3Bluetooth extends EV3 {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         serialPort.close();
     }
 
@@ -43,12 +42,19 @@ public class Ev3Bluetooth extends EV3 {
         byte[] x = new byte[inputLength];
         bytes.get(x, 0, inputLength);
         
+        
+//        System.err.println("send:");
+//        Ev3.hexdump(x);
+        
         // send to brick
         serialPort.getOutputStream().write(x);
         
         // read response
         byte[] response = new byte[EV3Usb.EV3_USB_BLOCK_SIZE];
         int length = serialPort.getInputStream().read(response);
+        
+//        System.err.println("receive:");
+//        Ev3.hexdump(response, length);
 
         ByteBuffer ret = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
         ret.put(response, 0, length);
@@ -64,6 +70,8 @@ public class Ev3Bluetooth extends EV3 {
         EV3 brick = desc.instantiate();
         
         brick.SYSTEM.playTone(50, 440, 500);
+        String name = brick.SYSTEM.getBrickName();
+        System.out.println("name: " + name);
     }
 
 }

@@ -7,6 +7,7 @@ package elmot.javabrick.ev3;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  *
@@ -20,8 +21,16 @@ public class Util {
         buf.put((byte) 0); // zero-terminated string
     }
 
+    /**
+     * Decode string from current position of ByteBuffer.
+     * 
+     * @param buf
+     * @param delimiter
+     * @return 
+     */
     public static String readString(ByteBuffer buf, char delimiter) {
         ByteBuffer ret = ByteBuffer.allocate(buf.capacity());
+        int strlen = 0;
 
         while (true) {
             byte b = buf.get();
@@ -30,9 +39,43 @@ public class Util {
                 break;
             } else {
                 ret.put(b);
+                strlen++;
             }
         }
 
-        return new String(ret.array());
+        byte[] strbuf = new byte[strlen];
+        ret.rewind();
+        ret.get(strbuf, 0, strlen);
+        return new String(strbuf);
+    }
+    
+    /**
+     * Decode string from given offset position of ByteBuffer.
+     * 
+     * @param buf
+     * @param offset
+     * @param delimiter
+     * @return 
+     */
+    public static String readString(ByteBuffer buf, int offset, char delimiter) {
+        ByteBuffer ret = ByteBuffer.allocate(buf.capacity());
+        int strlen = 0;
+
+        while (true) {
+            byte b = buf.get(offset++);
+
+            if (b == delimiter) {
+                break;
+            } else {
+                ret.put(b);
+                strlen++;
+            }
+        }
+        
+        byte[] strbuf = new byte[strlen];
+        ret.rewind();
+        ret.get(strbuf, 0, strlen);
+        
+        return new String(strbuf);
     }
 }

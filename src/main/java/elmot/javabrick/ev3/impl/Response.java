@@ -41,4 +41,8 @@ public class Response {
     public byte getByte(int index) {
         return (Byte) outParameters[index];
     }
+    
+    public String getString(int index) {
+        return (String) outParameters[index];
+    }
 }
