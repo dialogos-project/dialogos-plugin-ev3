@@ -1,16 +1,10 @@
 package elmot.javabrick.ev3;
 
-import com.clt.lego.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.impl.Command;
 import elmot.javabrick.ev3.impl.FactoryBase;
 import elmot.javabrick.ev3.impl.Response;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author elmot
@@ -32,9 +26,9 @@ public class SystemFactory extends FactoryBase {
     public void playTone(int volume, int frequency, int durationMs) throws IOException {
         Command command = new Command(CMD_SOUND);
         command.addByte(SUBCMD_TONE);
-        command.addIntConstantParam(volume);
-        command.addIntConstantParam(frequency);
-        command.addIntConstantParam(durationMs);
+        command.addLCX(volume);
+        command.addLCX(frequency);
+        command.addLCX(durationMs);
         run(command);
     }
 

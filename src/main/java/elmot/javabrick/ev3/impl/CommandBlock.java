@@ -48,6 +48,11 @@ public class CommandBlock {
         int seqNumber = getNextSeqCounter();
         buffer.putShort(2, (short) seqNumber);
         buffer.put(4, commandType);
+        
+//        System.err.printf("RUN cmd=%d seq=%d\n", commandType, seqNumber);
+//        Ev3.hexdump(buffer.array(), 16);
+        
+        // write commands with their parameters at position 7
         buffer.position(7);
         int globalVarCount = 0;// Local vars are not supported
         for (Command command : commands) {
@@ -70,7 +75,7 @@ public class CommandBlock {
 
         int readSeqNo = responseBytes.getShort(2);
         if (readSeqNo != seqNumber) {
-            throw new IOException("Unexpected Response seq. no.");
+            throw new IOException(String.format("Reponse had unexpected message ID: expected %d, got %d", seqNumber, readSeqNo));
         }
         int status = responseBytes.get(4);
         if (outParametersTypes != null) {

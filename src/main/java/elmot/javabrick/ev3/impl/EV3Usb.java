@@ -1,6 +1,5 @@
 package elmot.javabrick.ev3.impl;
 
-import com.clt.lego.ev3.Ev3;
 import elmot.javabrick.ev3.EV3;
 
 import javax.usb.*;

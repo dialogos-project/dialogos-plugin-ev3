@@ -7,6 +7,8 @@ package com.clt.lego.ev3;
 
 import elmot.javabrick.ev3.EV3;
 import elmot.javabrick.ev3.EV3FactoryUsb;
+import elmot.javabrick.ev3.Ev3FactoryBluetooth;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -39,17 +41,21 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
         return port;
     }
     
-    public EV3 instantiate() {
-        if( connectionType == ConnectionTypes.USB ) {
-            return EV3FactoryUsb.instantiate(this);
-        } else {
-            return null;
+    public EV3 instantiate() throws IOException {
+        switch (connectionType) {
+            case USB:
+                return EV3FactoryUsb.instantiate(this);
+            case BLUETOOTH:
+                return Ev3FactoryBluetooth.instantiate(this);
+            default:
+                return null;
         }
     }
     
     public static void discoverAll() {
         allDescriptors.clear();        
         EV3FactoryUsb.discoverDevices(allDescriptors);
+        Ev3FactoryBluetooth.discoverDevices(allDescriptors);
     }
     
     public static List<Ev3Descriptor> getAllDescriptors() {

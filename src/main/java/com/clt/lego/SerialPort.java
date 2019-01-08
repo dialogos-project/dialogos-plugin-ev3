@@ -79,17 +79,21 @@ public class SerialPort {
             if (port instanceof purejavacomm.SerialPort) {
                 this.serialPort = (purejavacomm.SerialPort) port;
 
+                /*
                 try {
-                    serialPort.setSerialPortParams(baudRate, dataBits, stopBits, parity);
-                    serialPort.enableReceiveTimeout(SerialPort.CONNECTION_TIMEOUT);
+                    // AKAKAK ignore params
+//                    serialPort.setSerialPortParams(baudRate, dataBits, stopBits, parity);
+//                    serialPort.enableReceiveTimeout(SerialPort.CONNECTION_TIMEOUT);
                 } catch (UnsupportedCommOperationException exn) {
                     port.close();
                     throw new IOException("Unsupported port parameters");
                 }
+                */
 
                 // This allows NXT programs to be run without resetting NXT each time.
-                serialPort.setRTS(true);
-                serialPort.setDTR(true);
+                // AKAKAK ignore
+//                serialPort.setRTS(true);
+//                serialPort.setDTR(true);
 
                 this.in = serialPort.getInputStream();
                 this.out = serialPort.getOutputStream();

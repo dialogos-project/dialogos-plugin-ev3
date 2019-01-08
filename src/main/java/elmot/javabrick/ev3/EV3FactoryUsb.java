@@ -2,7 +2,6 @@ package elmot.javabrick.ev3;
 
 import com.clt.lego.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.impl.EV3Usb;
-import java.io.IOException;
 
 import javax.usb.*;
 import java.net.SocketException;
@@ -24,11 +23,10 @@ public class EV3FactoryUsb {
     private static Map<String, UsbInterface> portsToInterfaces = new HashMap<>();
 
     public static void discoverDevices(List<Ev3Descriptor> descriptors) {
-        UsbHub hub;
         portsToInterfaces.clear();
         
         try {
-            hub = UsbHostManager.getUsbServices().getRootUsbHub();
+            UsbHub hub = UsbHostManager.getUsbServices().getRootUsbHub();
 
             for (UsbDevice device : (List<UsbDevice>) hub.getAttachedUsbDevices()) {
                 UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();

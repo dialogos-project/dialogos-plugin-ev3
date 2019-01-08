@@ -27,7 +27,7 @@ public class BluetoothCommInterface implements CommInterface{
         for (String port : SerialPort.getAvailablePorts()) {
             if( isPortCandidate(port)) {
                 try {
-                    SerialPort p = new SerialPort(port);
+                    SerialPort p = new SerialPort(port); // TODO - move SerialPort to same package
                     p.openForEv3();
                     
                     // found EV3

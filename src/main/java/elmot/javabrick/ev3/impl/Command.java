@@ -1,8 +1,8 @@
 package elmot.javabrick.ev3.impl;
 
+import elmot.javabrick.ev3.Ev3Constants;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,13 +14,13 @@ public class Command {
     private static final byte PARAMETER_TYPE_VARIABLE = (byte) 0x40;
     private static final byte VARIABLE_SCOPE_GLOBAL = (byte) 0x20;
     
-    private final int byteCode;
+    private final byte byteCode;
     private final int replyByteCount;
 
     private final List<byte[]> params = new ArrayList<byte[]>();
 
     public Command(int byteCode, int replyByteCount) {
-        this.byteCode = byteCode;
+        this.byteCode = (byte) byteCode;
         this.replyByteCount = replyByteCount;
     }
 
@@ -33,7 +33,7 @@ public class Command {
     }
 
     public byte getType() {
-        return 0;
+        return Ev3Constants.DIRECT_COMMAND_REPLY;
     }
 
     public void writeTo(ByteBuffer buffer) throws IOException {
@@ -125,17 +125,4 @@ public class Command {
             addLV4(value);
         }
     }
-
-    /*
-    public void addShort(int val) {
-        params.add(new byte[]{(byte) (val & 255), (byte) (val >> 8)});
-    }
-
-    public void addString(String val) {
-        ByteBuffer buf = ByteBuffer.allocate(val.length() + 1);
-        buf.put(val.getBytes(StandardCharsets.ISO_8859_1));
-        buf.put((byte) 0);
-        params.add(buf.array());
-    }
-*/
 }
