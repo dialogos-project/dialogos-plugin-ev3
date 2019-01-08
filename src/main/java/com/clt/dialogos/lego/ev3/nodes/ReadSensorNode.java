@@ -11,7 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.swing.BorderFactory;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -35,7 +34,11 @@ import com.clt.diamant.gui.NodePropertiesDialog;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.sensor.Mode;
 import elmot.javabrick.ev3.sensor.Port;
+import elmot.javabrick.ev3.sensor.RawOnlySensorFactory;
+import elmot.javabrick.ev3.sensor.SensorFactory;
+import java.util.Collections;
 
 /**
  * @author dabo
@@ -50,16 +53,12 @@ public class ReadSensorNode extends Ev3Node {
 
     // Don't change names. They are written to XML
     public ReadSensorNode() {
-
-        /* // add me back
-        this.setProperty(ReadSensorNode.MODE, Sensor.Mode.RAW);
-        this.setProperty(ReadSensorNode.SENSOR, new SensorPort(Sensor.Port.S1));
+        this.setProperty(ReadSensorNode.MODE, RawOnlySensorFactory.MODE.RAW); // TODO - will this work?
+        this.setProperty(ReadSensorNode.SENSOR, new SensorPort(Port.P1));
         this.addEdge();
-        */
     }
 
     public static Color getDefaultColor() {
-
         return new Color(255, 255, 153);
     }
 
@@ -84,55 +83,53 @@ public class ReadSensorNode extends Ev3Node {
 
         p.add(new JLabel(Resources.getString("SensorPort") + ':'), gbc);
         gbc.gridx++;
-        final JComboBox sensor = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.SENSOR, ports);
+        final JComboBox sensor = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.SENSOR, ports); // TODO -> createIntComboBox
         this.setProperty(ReadSensorNode.SENSOR, ports[0]);
         // sensor.setSelectedItem(ports[0]);
 
         p.add(sensor, gbc);
 
-        final JCheckBox activate
-                = NodePropertiesDialog.createCheckBox(properties, ReadSensorNode.ACTIVATE,
-                        Resources.getString("ActivateSensor"));
-
-        /** // TODO add me back
-        Sensor.Mode[] modes
-                = new Sensor.Mode[]{Sensor.Mode.RAW, Sensor.Mode.BOOLEAN,
-                    Sensor.Mode.PERCENTAGE};
-                    * */
-        
-        String[] modes = new String[] { "dummy" }; // TODO fix this
-        
-        final JComboBox sensorMode = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.MODE, modes);
+        // obsolete with EV3
+//        final JCheckBox activate = NodePropertiesDialog.createCheckBox(properties, ReadSensorNode.ACTIVATE, Resources.getString("ActivateSensor"));
+        /**
+         * // TODO add me back Sensor.Mode[] modes = new
+         * Sensor.Mode[]{Sensor.Mode.RAW, Sensor.Mode.BOOLEAN,
+         * Sensor.Mode.PERCENTAGE};
+                    *
+         */
+        Collection<? extends Mode> MODES_ONLY_RAW = Collections.singletonList(RawOnlySensorFactory.MODE.RAW);
+        final JComboBox sensorMode = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.MODE, MODES_ONLY_RAW);
         final JPanel options = new JPanel(new GridLayout(1, 1));
 
-        ItemListener typeListener = new ItemListener() {
+        ItemListener typeListener = (ItemEvent e) -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                SensorPort port = (SensorPort) e.getItem();
+                SensorType value = null;
+                if (port != null) {
+                    value = port.getType();
 
-            public void itemStateChanged(ItemEvent e) {
+                    // replace possible modes in mode list with the ones that are appropriate for this type of sensor
+                    SensorFactory factoryAtPort = null; // TODO fixme
+                    sensorMode.removeAll();
 
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    SensorPort port = (SensorPort) e.getItem();
-                    SensorType value = null;
-                    if (port != null) {
-                        value = port.getType();
-                        if (value == SensorType.ULTRASONIC) {
-                            // sensorMode.setSelectedItem(Sensor.Mode.RAW); // TODO fixme                            
-                            sensorMode.setEnabled(false);
-                        } else {
-                            sensorMode.setEnabled(true);
+                    if (factoryAtPort == null) {
+                        sensorMode.addItem(RawOnlySensorFactory.MODE.RAW);
+                    } else {
+                        for (Mode mode : factoryAtPort.getModes()) {
+                            sensorMode.addItem(mode);
                         }
                     }
 
-                    options.removeAll();
-                    if (value == SensorType.LIGHT) {
-                        options.add(activate);
-                    }
-                    if (p.isShowing()) {
-                        p.revalidate();
-                        p.repaint();
-                    }
+                    sensorMode.setSelectedIndex(0);
+                }
+
+                if (p.isShowing()) {
+                    p.revalidate();
+                    p.repaint();
                 }
             }
         };
+
         sensor.addItemListener(typeListener);
         typeListener.itemStateChanged(new ItemEvent(sensor,
                 ItemEvent.ITEM_STATE_CHANGED,
@@ -175,31 +172,30 @@ public class ReadSensorNode extends Ev3Node {
         try {
             Ev3Runtime runtime = (Ev3Runtime) this.getPluginRuntime(Plugin.class, comm);
             EV3 brick = runtime.getBrick();
-            
-            
+
             if (brick == null) {
-                throw new NodeExecutionException(this, Resources .getString("NoNxtBrickSelected"));
+                throw new NodeExecutionException(this, Resources.getString("NoNxtBrickSelected"));
             }
 
             SensorPort sensorPort = (SensorPort) this.getProperty(ReadSensorNode.SENSOR);
             if (sensorPort == null) {
                 throw new NodeExecutionException(this, Resources.getString("NoSensorSelected"));
             }
-            
-            boolean activate = this.getBooleanProperty(ReadSensorNode.ACTIVATE);
+
+//            boolean activate = this.getBooleanProperty(ReadSensorNode.ACTIVATE);
             /* // TODO fixme
             Sensor.Mode mode = (Sensor.Mode) this.getProperty(ReadSensorNode.MODE);
             if (mode == null) {
                 throw new NodeExecutionException(this, Resources.getString("SensorModeNotSet"));
             }
-            */
+             */
 
             Slot v = (Slot) this.getProperty(ReadSensorNode.VARIABLE);
             if (v == null) {
                 throw new NodeExecutionException(this,
                         com.clt.diamant.Resources.getString("NoVariableAssigned"));
             }
-            
+
             // TODO implement me
 
             /*
@@ -226,7 +222,7 @@ public class ReadSensorNode extends Ev3Node {
 
             int value = sensor.getValue();
             v.setValue(new IntValue(value));
-*/
+             */
         } catch (NodeExecutionException exn) {
             throw exn;
         } catch (Exception exn) {
@@ -285,6 +281,9 @@ public class ReadSensorNode extends Ev3Node {
                 r.raiseException(Resources.format("UnknownSensor", value));
             }
         } else if (name.equals(ReadSensorNode.MODE)) {
+            SensorFactory currentFactory = null; 
+            setProperty(MODE, value);
+            
             // TODO fixme
             /*
             for (Sensor.Mode mode : Sensor.Mode.values()) {
@@ -293,8 +292,8 @@ public class ReadSensorNode extends Ev3Node {
                     break;
                 }
             }
-*/
-            
+             */
+
             if (this.getProperty(ReadSensorNode.SENSOR) == null) {
                 r.raiseException(Resources.format("UnknownSensor", value));
             }
@@ -331,16 +330,17 @@ public class ReadSensorNode extends Ev3Node {
         }
 
         if (this.getProperty(ReadSensorNode.MODE) != null) {
-            // TODO fixme
-//            System.out.println(((Sensor.Mode) this.getProperty(ReadSensorNode.MODE)).getValue());
-            System.out.println((this.getProperty(ReadSensorNode.MODE)));
-            
-            // TODO fixme
-//            Graph.printAtt(out, ReadSensorNode.MODE, ((Sensor.Mode) this.getProperty(ReadSensorNode.MODE)).getValue());
+            Graph.printAtt(out, ReadSensorNode.MODE, getMode().getName());
         }
+        
         if (this.getBooleanProperty(ReadSensorNode.ACTIVATE)) {
             Graph.printAtt(out, ReadSensorNode.ACTIVATE, true);
         }
+    }
+    
+    private Mode getMode() {
+        return (Mode) getProperty(MODE);
+                
     }
 
     private class SensorPort {

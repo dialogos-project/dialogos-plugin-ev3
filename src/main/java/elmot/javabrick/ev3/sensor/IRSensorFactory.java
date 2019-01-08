@@ -3,13 +3,15 @@ package elmot.javabrick.ev3.sensor;
 import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * @author elmot
  */
 public class IRSensorFactory extends SensorFactory {
 
-    public enum IR_MODE {
+    public enum IR_MODE implements Mode {
         /// Use the IR sensor as a distance sensor
         PROXIMITY(0),
         /// Use the IR sensor to detect the location of the IR Remote
@@ -21,6 +23,16 @@ public class IRSensorFactory extends SensorFactory {
 
         private IR_MODE(int val) {
             this.val = val;
+        }
+
+        @Override
+        public int getId() {
+            return val;
+        }
+
+        @Override
+        public String getName() {
+            return name();
         }
     }
 
@@ -41,5 +53,16 @@ public class IRSensorFactory extends SensorFactory {
     }
     public int readRemote(int daisyChainLevel, Port port) throws IOException {
         return readRaw(daisyChainLevel, port);
+    }
+    
+    
+    @Override
+    public Collection<? extends Mode> getModes() {
+        return Arrays.asList(IR_MODE.values());
+    }
+
+    @Override
+    public Mode decodeMode(String modename) {
+        return IR_MODE.valueOf(modename);
     }
 }

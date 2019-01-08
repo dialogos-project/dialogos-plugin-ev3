@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * @author elmot
  */
-public class HTAngleSensor extends SensorFactory {
+public class HTAngleSensor extends RawOnlySensorFactory {
     public HTAngleSensor(EV3 brick) {
         super(brick);
     }

@@ -6,11 +6,12 @@ import elmot.javabrick.ev3.FactoryBase;
 import elmot.javabrick.ev3.Response;
 
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * @author elmot
  */
-public class SensorFactory extends FactoryBase {
+public abstract class SensorFactory extends FactoryBase {
 
     public static final int CMD_INPUT_DEVICE = 0x99;
     public static final int CMD_INPUT_READ = 0x9a;
@@ -93,6 +94,20 @@ public class SensorFactory extends FactoryBase {
         command.addShortGlobalVariable(0);
         Response run = run(command, byte.class);
         return run.getInt(0);
+    }
+    
+    public abstract Collection<? extends Mode> getModes();
+    
+    public abstract Mode decodeMode(String modename);
+    
+    public Mode decodeMode(int modeId) {
+        for( Mode mode : getModes() ) {
+            if( mode.getId() == modeId ) {
+                return mode;
+            }
+        }
+        
+        return null;
     }
 
 }

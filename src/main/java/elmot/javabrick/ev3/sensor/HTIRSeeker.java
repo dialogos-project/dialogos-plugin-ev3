@@ -3,6 +3,8 @@ package elmot.javabrick.ev3.sensor;
 import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * @author elmot
@@ -20,7 +22,7 @@ public class HTIRSeeker extends SensorFactory {
         return readRawByte(daisyChainLevel, port);
     }
 
-    public enum MODE {
+    public enum MODE implements Mode {
         DIR_DC(0), DIR_AC(1);
 
         private final int val;
@@ -28,5 +30,26 @@ public class HTIRSeeker extends SensorFactory {
         private MODE(int val) {
             this.val = val;
         }
+
+        @Override
+        public int getId() {
+            return val;
+        }
+
+        @Override
+        public String getName() {
+            return name();
+        }
+    }
+    
+    
+    @Override
+    public Collection<? extends Mode> getModes() {
+        return Arrays.asList(MODE.values());
+    }
+
+    @Override
+    public Mode decodeMode(String modename) {
+        return MODE.valueOf(modename);
     }
   }

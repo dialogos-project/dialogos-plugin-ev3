@@ -3,6 +3,8 @@ package elmot.javabrick.ev3.sensor;
 import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
  * @author elmot
@@ -30,8 +32,7 @@ public class GyroSensorFactory extends SensorFactory
         return readSI(daisyChainLevel, port, mode.val);
     }
 
-    public enum MODE
-    {
+    public enum MODE implements Mode {
         ANGLE(0),
         RATE(1),
         FAS(2);
@@ -42,5 +43,26 @@ public class GyroSensorFactory extends SensorFactory
         {
             this.val = val;
         }
+
+        @Override
+        public int getId() {
+            return val;
+        }
+
+        @Override
+        public String getName() {
+            return name();
+        }
+    }
+    
+    
+    @Override
+    public Collection<? extends Mode> getModes() {
+        return Arrays.asList(MODE.values());
+    }
+
+    @Override
+    public Mode decodeMode(String modename) {
+        return MODE.valueOf(modename);
     }
 }

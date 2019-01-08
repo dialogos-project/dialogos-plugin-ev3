@@ -6,7 +6,6 @@ import elmot.javabrick.ev3.sensor.IRSensorFactory;
 import elmot.javabrick.ev3.sensor.UltrasonicSensorFactory;
 import elmot.javabrick.ev3.sensor.GyroSensorFactory;
 import elmot.javabrick.ev3.sensor.TemperatureSensorFactory;
-import elmot.javabrick.ev3.sensor.CommonSensorFactory;
 import elmot.javabrick.ev3.sensor.ColorSensorFactory;
 import elmot.javabrick.ev3.sensor.TouchSensorFactory;
 import elmot.javabrick.ev3.sensor.HTAngleSensor;
@@ -28,7 +27,6 @@ public abstract class EV3 implements AutoCloseable {
     public final CompassSensorFactory COMPASS;
     public final SoundSensorFactory SOUND;
     public final TemperatureSensorFactory TEMP;
-    public final CommonSensorFactory COMMON_SENSOR;
     public final HTIRSeeker HT_IR_SEEKER;
     public final GyroSensorFactory GYRO;
     public final HTAngleSensor HT_ANGLE;
@@ -46,7 +44,6 @@ public abstract class EV3 implements AutoCloseable {
         COMPASS = new CompassSensorFactory(this);
         SOUND = new SoundSensorFactory(this);
         TEMP = new TemperatureSensorFactory(this);
-        COMMON_SENSOR = new CommonSensorFactory(this);
         HT_ANGLE = new HTAngleSensor(this);
         HT_IR_SEEKER = new HTIRSeeker(this);
         GYRO = new GyroSensorFactory(this);
