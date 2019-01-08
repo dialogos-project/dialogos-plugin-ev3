@@ -7,7 +7,6 @@ package elmot.javabrick.ev3;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 /**
  *
@@ -77,5 +76,24 @@ public class Util {
         ret.get(strbuf, 0, strlen);
         
         return new String(strbuf);
+    }
+
+    public static void hexdump(byte[] data) {
+        hexdump(data, Integer.MAX_VALUE);
+    }
+
+    public static void hexdump(byte[] data, int limit) {
+        int len = Math.min(data.length, limit);
+        int numRows = (len + 7) / 8;
+        for (int row = 0; row < numRows; row++) {
+            int numCols = Math.min(8, len - 8 * row);
+            StringBuilder hexPart = new StringBuilder();
+            StringBuilder chrPart = new StringBuilder();
+            for (int col = 0; col < numCols; col++) {
+                hexPart.append(String.format("%02x ", data[8 * row + col]));
+                chrPart.append((char) data[8 * row + col]);
+            }
+            System.err.printf("%-24s %s\n", hexPart.toString(), chrPart.toString());
+        }
     }
 }

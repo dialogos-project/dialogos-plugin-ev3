@@ -29,7 +29,6 @@ import com.clt.event.ProgressListener;
 import com.clt.gui.OptionPane;
 import com.clt.gui.ProgressDialog;
 import com.clt.io.InterfaceType;
-import com.clt.lego.ev3.Sensor;
 import com.clt.properties.DefaultEnumProperty;
 import com.clt.properties.Property;
 import com.clt.properties.PropertySet;
@@ -40,8 +39,10 @@ import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import java.util.ArrayList;
 import java.util.List;
-import com.clt.lego.ev3.Ev3Descriptor;
+import elmot.javabrick.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.sensor.Port;
+import java.util.EnumMap;
 
 /**
  * @author dabo, koller
@@ -50,7 +51,7 @@ public class Settings extends PluginSettings {
 
     private static Collection<Ev3Descriptor> availablePorts = new TreeSet<Ev3Descriptor>();
     private DefaultEnumProperty<Ev3Descriptor> ev3;
-    private Map<Sensor.Port, DefaultEnumProperty<SensorType>> sensorTypes;
+    private Map<Port, DefaultEnumProperty<SensorType>> sensorTypes;
 
     static {
         Settings.availablePorts.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.DUMMY, "--", "--"));
@@ -74,8 +75,8 @@ public class Settings extends PluginSettings {
             this.ev3.setValue(Settings.availablePorts.iterator().next());
         }
 
-        this.sensorTypes = new LinkedHashMap<Sensor.Port, DefaultEnumProperty<SensorType>>();
-        for (Sensor.Port port : Sensor.Port.values()) {
+        this.sensorTypes = new LinkedHashMap<Port, DefaultEnumProperty<SensorType>>();
+        for (Port port : Port.values()) {
             DefaultEnumProperty<SensorType> p = new DefaultEnumProperty<SensorType>(port.name(), port.toString(), null, SensorType.values(), SensorType.NONE);
             this.sensorTypes.put(port, p);
         }
@@ -264,8 +265,7 @@ public class Settings extends PluginSettings {
             r.setHandler(new AbstractHandler("att") {
 
                 @Override
-                protected void start(String name, Attributes atts)
-                        throws SAXException {
+                protected void start(String name, Attributes atts) throws SAXException {
 
                     if (name.equals("att")) {
                         r.setHandler(new AbstractHandler("att"));
@@ -280,9 +280,9 @@ public class Settings extends PluginSettings {
                             r.raiseException(exn);
                         }
 
-                        Sensor.Port port = null;
-                        for (Sensor.Port p : Sensor.Port.values()) {
-                            if (p.getID() == sensorID) {
+                        Port port = null;
+                        for (Port p : Port.values()) {
+                            if (p.portNum == sensorID) {
                                 port = p;
                             }
                         }
@@ -329,7 +329,7 @@ public class Settings extends PluginSettings {
 */
     }
 
-    public SensorType getSensorType(Sensor.Port port) {
+    public SensorType getSensorType(Port port) {
 
         return this.sensorTypes.get(port).getValue();
     }
@@ -345,11 +345,12 @@ public class Settings extends PluginSettings {
 
     @Override
     public Ev3Runtime createRuntime(Component parent) throws Exception {
-
-        Map<Sensor.Port, SensorType> sensorTypes = new HashMap<Sensor.Port, SensorType>();
-        for (Sensor.Port port : this.sensorTypes.keySet()) {
+        Map<Port, SensorType> sensorTypes = new EnumMap<Port, SensorType>(Port.class);
+        
+        for (Port port : this.sensorTypes.keySet()) {
             sensorTypes.put(port, this.getSensorType(port));
         }
+        
         return new Ev3Runtime(this.createBrick(parent), sensorTypes);
     }
 }

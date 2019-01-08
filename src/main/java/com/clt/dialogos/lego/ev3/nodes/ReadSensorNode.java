@@ -32,11 +32,10 @@ import com.clt.diamant.graph.Graph;
 import com.clt.diamant.graph.nodes.NodeExecutionException;
 import com.clt.diamant.graph.search.SearchResult;
 import com.clt.diamant.gui.NodePropertiesDialog;
-import com.clt.lego.ev3.Sensor;
-import com.clt.script.exp.values.IntValue;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.sensor.Port;
 
 /**
  * @author dabo
@@ -52,9 +51,11 @@ public class ReadSensorNode extends Ev3Node {
     // Don't change names. They are written to XML
     public ReadSensorNode() {
 
+        /* // add me back
         this.setProperty(ReadSensorNode.MODE, Sensor.Mode.RAW);
         this.setProperty(ReadSensorNode.SENSOR, new SensorPort(Sensor.Port.S1));
         this.addEdge();
+        */
     }
 
     public static Color getDefaultColor() {
@@ -75,17 +76,15 @@ public class ReadSensorNode extends Ev3Node {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
 
-        SensorPort ports[] = new SensorPort[Sensor.Port.values().length];
+        SensorPort ports[] = new SensorPort[Port.values().length];
         int i = 0;
-        for (Sensor.Port port : Sensor.Port.values()) {
+        for (Port port : Port.values()) {
             ports[i++] = new SensorPort(port);
         }
 
         p.add(new JLabel(Resources.getString("SensorPort") + ':'), gbc);
         gbc.gridx++;
-        final JComboBox sensor
-                = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.SENSOR,
-                        ports);
+        final JComboBox sensor = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.SENSOR, ports);
         this.setProperty(ReadSensorNode.SENSOR, ports[0]);
         // sensor.setSelectedItem(ports[0]);
 
@@ -95,13 +94,15 @@ public class ReadSensorNode extends Ev3Node {
                 = NodePropertiesDialog.createCheckBox(properties, ReadSensorNode.ACTIVATE,
                         Resources.getString("ActivateSensor"));
 
+        /** // TODO add me back
         Sensor.Mode[] modes
                 = new Sensor.Mode[]{Sensor.Mode.RAW, Sensor.Mode.BOOLEAN,
                     Sensor.Mode.PERCENTAGE};
-        final JComboBox sensorMode
-                = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.MODE,
-                        modes);
-
+                    * */
+        
+        String[] modes = new String[] { "dummy" }; // TODO fix this
+        
+        final JComboBox sensorMode = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.MODE, modes);
         final JPanel options = new JPanel(new GridLayout(1, 1));
 
         ItemListener typeListener = new ItemListener() {
@@ -114,7 +115,7 @@ public class ReadSensorNode extends Ev3Node {
                     if (port != null) {
                         value = port.getType();
                         if (value == SensorType.ULTRASONIC) {
-                            sensorMode.setSelectedItem(Sensor.Mode.RAW);
+                            // sensorMode.setSelectedItem(Sensor.Mode.RAW); // TODO fixme                            
                             sensorMode.setEnabled(false);
                         } else {
                             sensorMode.setEnabled(true);
@@ -186,10 +187,12 @@ public class ReadSensorNode extends Ev3Node {
             }
             
             boolean activate = this.getBooleanProperty(ReadSensorNode.ACTIVATE);
+            /* // TODO fixme
             Sensor.Mode mode = (Sensor.Mode) this.getProperty(ReadSensorNode.MODE);
             if (mode == null) {
                 throw new NodeExecutionException(this, Resources.getString("SensorModeNotSet"));
             }
+            */
 
             Slot v = (Slot) this.getProperty(ReadSensorNode.VARIABLE);
             if (v == null) {
@@ -272,8 +275,8 @@ public class ReadSensorNode extends Ev3Node {
             throws SAXException {
 
         if (name.equals(ReadSensorNode.SENSOR)) {
-            for (Sensor.Port s : Sensor.Port.values()) {
-                if (String.valueOf(s.getID()).equals(value)) {
+            for (Port s : Port.values()) {
+                if (String.valueOf(s.portNum).equals(value)) {
                     this.setProperty(ReadSensorNode.SENSOR, new SensorPort(s));
                     break;
                 }
@@ -282,12 +285,16 @@ public class ReadSensorNode extends Ev3Node {
                 r.raiseException(Resources.format("UnknownSensor", value));
             }
         } else if (name.equals(ReadSensorNode.MODE)) {
+            // TODO fixme
+            /*
             for (Sensor.Mode mode : Sensor.Mode.values()) {
                 if (String.valueOf(mode.getValue()).equals(value)) {
                     this.setProperty(ReadSensorNode.MODE, mode);
                     break;
                 }
             }
+*/
+            
             if (this.getProperty(ReadSensorNode.SENSOR) == null) {
                 r.raiseException(Resources.format("UnknownSensor", value));
             }
@@ -295,8 +302,7 @@ public class ReadSensorNode extends Ev3Node {
             try {
                 this.setProperty(ReadSensorNode.VARIABLE, uid_map.variables.get(value));
             } catch (Exception exn) {
-                r.raiseException(com.clt.diamant.Resources.format("UnknownVariable",
-                        "ID " + value));
+                r.raiseException(com.clt.diamant.Resources.format("UnknownVariable", "ID " + value));
             }
         } else if (name.equals(ReadSensorNode.ACTIVATE)) {
             this.setProperty(name, value.equals("1") ? Boolean.TRUE : Boolean.FALSE);
@@ -312,7 +318,7 @@ public class ReadSensorNode extends Ev3Node {
 
         SensorPort sensor = (SensorPort) this.getProperty(ReadSensorNode.SENSOR);
         if (sensor != null) {
-            Graph.printAtt(out, ReadSensorNode.SENSOR, sensor.getPort().getID());
+            Graph.printAtt(out, ReadSensorNode.SENSOR, sensor.getPort().portNum);
         }
 
         Slot v = (Slot) this.getProperty(ReadSensorNode.VARIABLE);
@@ -325,11 +331,12 @@ public class ReadSensorNode extends Ev3Node {
         }
 
         if (this.getProperty(ReadSensorNode.MODE) != null) {
-            System.out.println(((Sensor.Mode) this.getProperty(ReadSensorNode.MODE))
-                    .getValue());
+            // TODO fixme
+//            System.out.println(((Sensor.Mode) this.getProperty(ReadSensorNode.MODE)).getValue());
             System.out.println((this.getProperty(ReadSensorNode.MODE)));
-            Graph.printAtt(out, ReadSensorNode.MODE, ((Sensor.Mode) this
-                    .getProperty(ReadSensorNode.MODE)).getValue());
+            
+            // TODO fixme
+//            Graph.printAtt(out, ReadSensorNode.MODE, ((Sensor.Mode) this.getProperty(ReadSensorNode.MODE)).getValue());
         }
         if (this.getBooleanProperty(ReadSensorNode.ACTIVATE)) {
             Graph.printAtt(out, ReadSensorNode.ACTIVATE, true);
@@ -338,33 +345,27 @@ public class ReadSensorNode extends Ev3Node {
 
     private class SensorPort {
 
-        private Sensor.Port port;
+        private Port port;
 
-        public SensorPort(Sensor.Port port) {
-
+        public SensorPort(Port port) {
             this.port = port;
         }
 
-        public Sensor.Port getPort() {
-
+        public Port getPort() {
             return this.port;
         }
 
         public SensorType getType() {
-
-            return ((Settings) ReadSensorNode.this.getPluginSettings(Plugin.class))
-                    .getSensorType(this.port);
+            return ((Settings) ReadSensorNode.this.getPluginSettings(Plugin.class)).getSensorType(this.port);
         }
 
         @Override
         public int hashCode() {
-
             return this.port.hashCode();
         }
 
         @Override
         public boolean equals(Object o) {
-
             if (o instanceof SensorPort) {
                 return ((SensorPort) o).getPort().equals(this.getPort());
             } else {
@@ -374,7 +375,6 @@ public class ReadSensorNode extends Ev3Node {
 
         @Override
         public String toString() {
-
             return this.port + " (" + this.getType() + ")";
         }
     }

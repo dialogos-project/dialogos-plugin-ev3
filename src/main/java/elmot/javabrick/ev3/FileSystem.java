@@ -5,11 +5,6 @@
  */
 package elmot.javabrick.ev3;
 
-import com.clt.lego.ev3.Ev3Descriptor;
-import elmot.javabrick.ev3.impl.Command;
-import elmot.javabrick.ev3.impl.CommandBlock;
-import elmot.javabrick.ev3.impl.FactoryBase;
-import elmot.javabrick.ev3.impl.Response;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;

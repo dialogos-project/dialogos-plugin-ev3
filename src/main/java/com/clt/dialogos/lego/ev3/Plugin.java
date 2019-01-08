@@ -23,7 +23,7 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
         registerNodeTypes(this.getName(), Arrays.asList(new Class<?>[]{
             ProgramNode.class, 
             StopProgramNode.class, 
-//            ReadSensorNode.class, 
+            ReadSensorNode.class, 
             MotorNode.class
         }));
     }

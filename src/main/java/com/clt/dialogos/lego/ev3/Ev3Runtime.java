@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.clt.dialogos.plugin.PluginRuntime;
-import com.clt.lego.ev3.Sensor;
-import com.clt.lego.ev3.Ev3;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.sensor.SensorFactory;
+import elmot.javabrick.ev3.sensor.Port;
 
 /**
  * @author dabo
@@ -15,9 +15,9 @@ import elmot.javabrick.ev3.EV3;
 public class Ev3Runtime implements PluginRuntime {
 
     private EV3 brick;
-    private Map<Sensor.Port, SensorType> sensorTypes;
+    private Map<Port, SensorType> sensorTypes;
 
-    public Ev3Runtime(EV3 brick, Map<Sensor.Port, SensorType> sensorTypes) {
+    public Ev3Runtime(EV3 brick, Map<Port, SensorType> sensorTypes) {
 
         this.brick = brick;
         this.sensorTypes = sensorTypes;
@@ -77,8 +77,7 @@ public class Ev3Runtime implements PluginRuntime {
         return this.brick;
     }
 
-    public SensorType getSensorType(Sensor.Port port) {
-
+    public SensorType getSensorType(Port port) {
         return this.sensorTypes.get(port);
     }
 }

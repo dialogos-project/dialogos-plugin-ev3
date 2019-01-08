@@ -1,7 +1,16 @@
 package elmot.javabrick.ev3;
 
-import elmot.javabrick.ev3.impl.CommandBlock;
-import elmot.javabrick.ev3.impl.Response;
+import elmot.javabrick.ev3.sensor.HTIRSeeker;
+import elmot.javabrick.ev3.sensor.CompassSensorFactory;
+import elmot.javabrick.ev3.sensor.IRSensorFactory;
+import elmot.javabrick.ev3.sensor.UltrasonicSensorFactory;
+import elmot.javabrick.ev3.sensor.GyroSensorFactory;
+import elmot.javabrick.ev3.sensor.TemperatureSensorFactory;
+import elmot.javabrick.ev3.sensor.CommonSensorFactory;
+import elmot.javabrick.ev3.sensor.ColorSensorFactory;
+import elmot.javabrick.ev3.sensor.TouchSensorFactory;
+import elmot.javabrick.ev3.sensor.HTAngleSensor;
+import elmot.javabrick.ev3.sensor.SoundSensorFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -18,7 +27,7 @@ public abstract class EV3 implements AutoCloseable {
     public final IRSensorFactory IR;
     public final CompassSensorFactory COMPASS;
     public final SoundSensorFactory SOUND;
-    public final TempSensorFactory TEMP;
+    public final TemperatureSensorFactory TEMP;
     public final CommonSensorFactory COMMON_SENSOR;
     public final HTIRSeeker HT_IR_SEEKER;
     public final GyroSensorFactory GYRO;
@@ -36,7 +45,7 @@ public abstract class EV3 implements AutoCloseable {
         IR = new IRSensorFactory(this);
         COMPASS = new CompassSensorFactory(this);
         SOUND = new SoundSensorFactory(this);
-        TEMP = new TempSensorFactory(this);
+        TEMP = new TemperatureSensorFactory(this);
         COMMON_SENSOR = new CommonSensorFactory(this);
         HT_ANGLE = new HTAngleSensor(this);
         HT_IR_SEEKER = new HTIRSeeker(this);

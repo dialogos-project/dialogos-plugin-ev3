@@ -1,8 +1,5 @@
 package elmot.javabrick.ev3;
 
-import elmot.javabrick.ev3.impl.Command;
-import elmot.javabrick.ev3.impl.FactoryBase;
-import elmot.javabrick.ev3.impl.Response;
 
 import java.io.IOException;
 
