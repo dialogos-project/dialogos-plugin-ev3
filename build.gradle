@@ -11,11 +11,11 @@ repositories {
 }
 
 dependencies {
-  implementation(group:'com.github.dialogos-project', name:'dialogos', version:'2.0.5') {
+  implementation(group:'com.github.dialogos-project', name:'dialogos', version:'2.0.6-SNAPSHOT') {
     exclude module: 'DialogOS_SphinxPlugin'
     exclude module: 'DialogOS_MaryTTSPlugin'
   }
-  runtime group:'com.github.dialogos-project', name:'dialogos', version:'2.0.5' // more fun to test with plugins
+  runtime group:'com.github.dialogos-project', name:'dialogos', version:'2.0.6-SNAPSHOT' // more fun to test with plugins
   implementation group: "com.github.purejavacomm", name: "purejavacomm", version: "1.0.1.RELEASE"
   implementation group: "org.usb4java", name: "usb4java-javax", version: "1.2.0"
 }

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import com.clt.dialogos.plugin.PluginRuntime;
 import elmot.javabrick.ev3.EV3;
-import elmot.javabrick.ev3.sensor.SensorFactory;
 import elmot.javabrick.ev3.sensor.Port;
 
 /**

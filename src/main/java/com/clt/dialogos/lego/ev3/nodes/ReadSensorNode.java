@@ -51,9 +51,13 @@ public class ReadSensorNode extends Ev3Node {
     private static final String ACTIVATE = "activate";
     private static final String VARIABLE = "variable";
 
+    // TODO:
+    // - replace SensorType by SensorFactory (= singleton for each sensor class)
+    // - implement SensorFactory#toString to get human-readable names for all the sensor types
+    // - detect sensor type on port automatically (how?)
     // Don't change names. They are written to XML
     public ReadSensorNode() {
-        this.setProperty(ReadSensorNode.MODE, RawOnlySensorFactory.MODE.RAW); // TODO - will this work?
+        this.setProperty(ReadSensorNode.MODE, 0);
         this.setProperty(ReadSensorNode.SENSOR, new SensorPort(Port.P1));
         this.addEdge();
     }
@@ -83,7 +87,7 @@ public class ReadSensorNode extends Ev3Node {
 
         p.add(new JLabel(Resources.getString("SensorPort") + ':'), gbc);
         gbc.gridx++;
-        final JComboBox sensor = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.SENSOR, ports); // TODO -> createIntComboBox
+        final JComboBox sensor = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.SENSOR, ports);
         this.setProperty(ReadSensorNode.SENSOR, ports[0]);
         // sensor.setSelectedItem(ports[0]);
 
@@ -95,10 +99,10 @@ public class ReadSensorNode extends Ev3Node {
          * // TODO add me back Sensor.Mode[] modes = new
          * Sensor.Mode[]{Sensor.Mode.RAW, Sensor.Mode.BOOLEAN,
          * Sensor.Mode.PERCENTAGE};
-                    *
+         *
          */
         Collection<? extends Mode> MODES_ONLY_RAW = Collections.singletonList(RawOnlySensorFactory.MODE.RAW);
-        final JComboBox sensorMode = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.MODE, MODES_ONLY_RAW);
+        final JComboBox sensorMode = NodePropertiesDialog.createIntComboBox(properties, ReadSensorNode.MODE, MODES_ONLY_RAW);  // TODO -> createIntComboBox
         final JPanel options = new JPanel(new GridLayout(1, 1));
 
         ItemListener typeListener = (ItemEvent e) -> {
@@ -182,25 +186,25 @@ public class ReadSensorNode extends Ev3Node {
                 throw new NodeExecutionException(this, Resources.getString("NoSensorSelected"));
             }
 
-//            boolean activate = this.getBooleanProperty(ReadSensorNode.ACTIVATE);
-            /* // TODO fixme
-            Sensor.Mode mode = (Sensor.Mode) this.getProperty(ReadSensorNode.MODE);
-            if (mode == null) {
-                throw new NodeExecutionException(this, Resources.getString("SensorModeNotSet"));
-            }
-             */
-
             Slot v = (Slot) this.getProperty(ReadSensorNode.VARIABLE);
             if (v == null) {
-                throw new NodeExecutionException(this,
-                        com.clt.diamant.Resources.getString("NoVariableAssigned"));
+                throw new NodeExecutionException(this, com.clt.diamant.Resources.getString("NoVariableAssigned"));
             }
 
             // TODO implement me
+            int mode = getModeId();
+            SensorFactory factoryAtPort = null; // TODO fixme - get from Runtime
+            SensorType type = runtime.getSensorType(sensorPort.getPort());
+
+            // TODO implement Mode#getValueClass (type Class)
+            // TODO implement method SensorFactory#readFloat(Port port,int mode) etc.
+            // -> set sensor to that mode
+            // -> read value and convert to correct class
+            // -> set variable to value of that class
+            
 
             /*
             Sensor sensor = new Sensor(brick, sensorPort.getPort());
-            SensorType type = runtime.getSensorType(sensorPort.getPort());
             switch (type) {
                 case TOUCH:
                     sensor.setType(Sensor.Type.SWITCH, mode);
@@ -266,10 +270,7 @@ public class ReadSensorNode extends Ev3Node {
     }
 
     @Override
-    protected void readAttribute(XMLReader r, String name, String value,
-            IdMap uid_map)
-            throws SAXException {
-
+    protected void readAttribute(XMLReader r, String name, String value, IdMap uid_map) throws SAXException {
         if (name.equals(ReadSensorNode.SENSOR)) {
             for (Port s : Port.values()) {
                 if (String.valueOf(s.portNum).equals(value)) {
@@ -281,18 +282,7 @@ public class ReadSensorNode extends Ev3Node {
                 r.raiseException(Resources.format("UnknownSensor", value));
             }
         } else if (name.equals(ReadSensorNode.MODE)) {
-            SensorFactory currentFactory = null; 
-            setProperty(MODE, value);
-            
-            // TODO fixme
-            /*
-            for (Sensor.Mode mode : Sensor.Mode.values()) {
-                if (String.valueOf(mode.getValue()).equals(value)) {
-                    this.setProperty(ReadSensorNode.MODE, mode);
-                    break;
-                }
-            }
-             */
+            setProperty(MODE, Integer.parseInt(value));
 
             if (this.getProperty(ReadSensorNode.SENSOR) == null) {
                 r.raiseException(Resources.format("UnknownSensor", value));
@@ -330,17 +320,17 @@ public class ReadSensorNode extends Ev3Node {
         }
 
         if (this.getProperty(ReadSensorNode.MODE) != null) {
-            Graph.printAtt(out, ReadSensorNode.MODE, getMode().getName());
+            Graph.printAtt(out, ReadSensorNode.MODE, getModeId());
         }
-        
+
         if (this.getBooleanProperty(ReadSensorNode.ACTIVATE)) {
             Graph.printAtt(out, ReadSensorNode.ACTIVATE, true);
         }
     }
-    
-    private Mode getMode() {
-        return (Mode) getProperty(MODE);
-                
+
+    private int getModeId() {
+        return (Integer) getProperty(MODE);
+
     }
 
     private class SensorPort {

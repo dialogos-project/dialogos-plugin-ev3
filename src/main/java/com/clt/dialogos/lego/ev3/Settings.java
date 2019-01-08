@@ -10,7 +10,6 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeSet;
@@ -52,7 +51,7 @@ public class Settings extends PluginSettings {
     private static Collection<Ev3Descriptor> availablePorts = new TreeSet<Ev3Descriptor>();
     private DefaultEnumProperty<Ev3Descriptor> ev3;
     private Map<Port, DefaultEnumProperty<SensorType>> sensorTypes;
-
+    
     static {
         Settings.availablePorts.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.DUMMY, "--", "--"));
     }

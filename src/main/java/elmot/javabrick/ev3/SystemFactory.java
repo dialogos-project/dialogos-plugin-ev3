@@ -48,12 +48,11 @@ public class SystemFactory extends FactoryBase {
     }
     
     public String getBrickName() throws IOException {
-        Command command = new Command(CMD_GET, 100);
+        Command command = new Command(CMD_GET, 200);
         command.addByte(SUBCMD_GET_BRICKNAME);
-        command.addLCX(64);
+        command.addLCX(128);
         command.addShortGlobalVariable(0);
         Response response = run(command, String.class);
         return response.getString(0);
-        
     }
 }
