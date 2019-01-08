@@ -49,9 +49,6 @@ public class CommandBlock {
         buffer.putShort(2, (short) seqNumber);
         buffer.put(4, commandType);
         
-//        System.err.printf("RUN cmd=%d seq=%d\n", commandType, seqNumber);
-//        Ev3.hexdump(buffer.array(), 16);
-        
         // write commands with their parameters at position 7
         buffer.position(7);
         int globalVarCount = 0;// Local vars are not supported
@@ -65,13 +62,8 @@ public class CommandBlock {
         buffer.putShort(0, (short) len);
         buffer.putShort(5, (short) globalVarCount);
         buffer.rewind();
-        
-//        System.err.println("** global var count:  " + globalVarCount);
 
         ByteBuffer responseBytes = brick.dataExchange(buffer, seqNumber);
-        
-//        System.err.println("COMMANDBLOCK RESPONSE:");
-//        Ev3.hexdump(responseBytes.array(), 100);
 
         int readSeqNo = responseBytes.getShort(2);
         if (readSeqNo != seqNumber) {

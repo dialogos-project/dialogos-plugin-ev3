@@ -19,13 +19,11 @@ import java.nio.ByteOrder;
  */
 public class Ev3Bluetooth extends EV3 {
 
-    private final String port;
     private final SerialPort serialPort;
 
     public Ev3Bluetooth(String port) throws IOException {
-        this.port = port;
         serialPort = new SerialPort(port);
-        serialPort.openForEv3();
+        serialPort.open();
     }
 
     @Override
@@ -42,22 +40,8 @@ public class Ev3Bluetooth extends EV3 {
     public ByteBuffer dataExchange(ByteBuffer bytes, int expectedSeqNo) throws IOException {
         bytes.rewind();
         int inputLength = bytes.limit();
-
-        // copy bytes to dataToSend at offset 2
-        byte[] dataToSend = new byte[inputLength + 2];
-        bytes.get(dataToSend, 2, inputLength);
-
-        // write Bluetooth length header
-        dataToSend[0] = (byte) (inputLength & 0xFF);
-        dataToSend[1] = (byte) (inputLength >>> 8);
-        
-//        System.err.println("send:");
-//        Ev3.hexdump(dataToSend);
-        
         byte[] x = new byte[inputLength];
-        bytes.rewind();
         bytes.get(x, 0, inputLength);
-        
         
         // send to brick
         serialPort.getOutputStream().write(x);
@@ -65,12 +49,9 @@ public class Ev3Bluetooth extends EV3 {
         // read response
         byte[] response = new byte[EV3Usb.EV3_USB_BLOCK_SIZE];
         int length = serialPort.getInputStream().read(response);
-        
-//        System.err.printf("Received response of %d bytes:\n", length);
-//        Ev3.hexdump(response, length);
-        
+
         ByteBuffer ret = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
-        ret.put(response, 0, length); //, 2, length-2);
+        ret.put(response, 0, length);
         
         return ret;
     }
