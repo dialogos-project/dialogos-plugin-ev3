@@ -53,7 +53,9 @@ public class SerialPort {
         CommPort port;
 
         try {
+            System.err.println("open");
             port = this.portIdentifier.open(portIdentifier.getName(), CONNECTION_TIMEOUT);
+            System.err.println("opened");
         } catch (PortInUseException exn) {
             throw new IOException("Port is already in use by " + portIdentifier.getCurrentOwner());
         }

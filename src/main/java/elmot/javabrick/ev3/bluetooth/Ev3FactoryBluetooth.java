@@ -21,11 +21,15 @@ public class Ev3FactoryBluetooth {
 
     public static void discoverDevices(List<Ev3Descriptor> descriptors) {
         for (String port : SerialPort.getAvailablePorts()) {
+            System.err.println("consider port: " + port);
             
             if (isPortCandidate(port)) {
                 try {
+                    System.err.println("instantiate");
                     Ev3Bluetooth inst = new Ev3Bluetooth(port);
+                    System.err.println("have inst");
                     String brickname = inst.SYSTEM.getBrickName();
+                    System.err.println("brickname: " + brickname);
                     inst.close();
 
                     if (brickname != null) {

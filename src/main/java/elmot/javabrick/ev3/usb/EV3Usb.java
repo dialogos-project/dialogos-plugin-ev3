@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 public class EV3Usb extends EV3 implements UsbInterfacePolicy {
 
-    public static boolean SUPPRESS_WARNINGS = true;
+    public static final boolean SUPPRESS_WARNINGS = true;
     public static final int EV3_USB_BLOCK_SIZE = 1024;
     public static final Logger LOGGER = Logger.getLogger(EV3Usb.class.getName());
     private final UsbInterface brick;

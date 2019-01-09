@@ -7,6 +7,8 @@ package elmot.javabrick.ev3.bluetooth;
 
 import elmot.javabrick.ev3.usb.EV3Usb;
 import elmot.javabrick.ev3.EV3;
+import static elmot.javabrick.ev3.usb.EV3Usb.LOGGER;
+import static elmot.javabrick.ev3.usb.EV3Usb.SUPPRESS_WARNINGS;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -47,14 +49,23 @@ public class Ev3Bluetooth extends EV3 {
         serialPort.getOutputStream().write(x);
 
         // read response
-        byte[] response = new byte[EV3Usb.EV3_USB_BLOCK_SIZE];
-        int length = serialPort.getInputStream().read(response);
+        while (true) {
+            byte[] response = new byte[EV3Usb.EV3_USB_BLOCK_SIZE];
+            int length = serialPort.getInputStream().read(response);
 
-//        System.err.println("receive:");
-//        Ev3.hexdump(response, length);
-        ByteBuffer ret = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
-        ret.put(response, 0, length);
+            ByteBuffer ret = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
+            ret.put(response, 0, length);
 
-        return ret;
+            int readSeqNo = ret.getShort(2);
+            if (readSeqNo != expectedSeqNo) {
+                if (!SUPPRESS_WARNINGS) {
+                    LOGGER.warning("Resynch EV3 seq no");
+                }
+
+                continue;
+            }
+
+            return ret;
+        }
     }
 }
