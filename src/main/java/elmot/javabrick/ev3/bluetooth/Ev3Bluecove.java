@@ -29,15 +29,13 @@ public class Ev3Bluecove extends EV3 {
     private OutputStream out;
 
     public Ev3Bluecove(String bluetoothAddress) throws IOException {
-        System.err.println("addr: " + bluetoothAddress);
-
-        System.err.println("bc"); // AKAKAK
-        c = (StreamConnection) Connector.open("btspp://" + bluetoothAddress + ":1");
-        System.err.println("opened");
-
-        in = c.openInputStream();
-        out = c.openOutputStream();
-        System.err.println("have streams");
+        try {
+            c = (StreamConnection) Connector.open("btspp://" + bluetoothAddress + ":1");
+            in = c.openInputStream();
+            out = c.openOutputStream();
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -49,7 +47,6 @@ public class Ev3Bluecove extends EV3 {
         in.close();
         out.close();
         c.close();
-        System.err.println("closed all");
     }
 
     @Override
@@ -59,8 +56,8 @@ public class Ev3Bluecove extends EV3 {
         byte[] x = new byte[inputLength];
         bytes.get(x, 0, inputLength);
 
-        System.err.println("send:");
-        Util.hexdump(x);
+//        System.err.println("send:");
+//        Util.hexdump(x);
 
         // send to brick
         out.write(x);
@@ -71,8 +68,8 @@ public class Ev3Bluecove extends EV3 {
             byte[] response = new byte[256];
             int length = in.read(response);
 
-            System.err.println("\nreceive:");
-            Util.hexdump(response, length);
+//            System.err.println("\nreceive:");
+//            Util.hexdump(response, length);
 
             ByteBuffer ret = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
             ret.put(response, 0, length);

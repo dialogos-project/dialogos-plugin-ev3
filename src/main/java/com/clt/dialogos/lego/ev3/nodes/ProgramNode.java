@@ -100,19 +100,14 @@ public class ProgramNode extends Ev3Node {
                             if (brick == null) {
                                 throw new Exception(Resources.getString("NoNxtBrickSelected"));
                             }
-
-                            System.err.println("a"); // AKAKAK
                             
                             List<FileSystem.Ev3File> files = brick.FILE.findFiles(FileSystem.PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
-                            System.err.println("b");
                             
                             programs = new String[files.size()];
                             int i = 0;
                             for (FileSystem.Ev3File f : files) {
                                 programs[i++] = f.getRelativePathname();
                             }
-                            
-                            System.err.println("c");
 
                             return programs;
                         }

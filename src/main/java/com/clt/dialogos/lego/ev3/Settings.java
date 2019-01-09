@@ -97,8 +97,6 @@ public class Settings extends PluginSettings {
     }
 
     private void resetBrick() {
-        System.err.println("reset brick");
-        
         if( brick != null ) {
             try {
                 brick.close();
@@ -378,7 +376,7 @@ public class Settings extends PluginSettings {
     }
 
     public EV3 createBrick(Component parent) throws IOException, UserCanceledException {
-        System.err.printf("createBrick: val=%s\n", ev3.getValue());
+//        System.err.printf("createBrick: val=%s\n", ev3.getValue());
         if (this.ev3.getValue() != null) {
             brick = this.ev3.getValue().instantiate();
             return brick;

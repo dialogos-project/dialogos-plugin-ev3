@@ -70,20 +70,8 @@ public abstract class EV3 implements AutoCloseable {
         EV3 brick = new Ev3Bluecove("0016535F47FA");
         
 //        Ev3Descriptor.discoverAll();
-//        Ev3Descriptor desc = Ev3Descriptor.getAllDescriptors().get(0);
-//        System.err.println(desc);        
-//        EV3 brick = desc.instantiate();
-
-//        System.err.println("name: " + brick.SYSTEM.getBrickName());
-//        System.err.println("again: " + brick.SYSTEM.getBrickName());
-//        System.err.println("3: " + brick.SYSTEM.getBrickName());
-//        System.err.println("4: " + brick.SYSTEM.getBrickName());
-//        System.err.println("5: " + brick.SYSTEM.getBrickName());
-        
-//        String absoluteFilename = FileSystem.Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf");
-//        brick.FILE.startProgram(absoluteFilename);
-        
-//        brick.SYSTEM.playTone(50, 440, 500);
+//        System.err.println(Ev3Descriptor.getAllDescriptors());
+//        System.exit(0);
 
         List<FileSystem.Ev3File> files = brick.FILE.findFiles(FileSystem.PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
         System.out.println(files);

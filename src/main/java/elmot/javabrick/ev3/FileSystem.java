@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +26,7 @@ public class FileSystem extends FactoryBase {
         super(ev3);
     }
 
-    private static final int CHUNKSIZE = 200; // AKAKAK
+    private static final int CHUNKSIZE = 1000;
 
     private static List<String> decodeResponses(ByteBuffer buf, int length, char separator) {
         byte[] arr = buf.array();
