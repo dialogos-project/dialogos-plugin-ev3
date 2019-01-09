@@ -1,5 +1,6 @@
 package elmot.javabrick.ev3;
 
+import elmot.javabrick.ev3.bluetooth.Ev3Bluecove;
 import elmot.javabrick.ev3.sensor.HTIRSeeker;
 import elmot.javabrick.ev3.sensor.CompassSensorFactory;
 import elmot.javabrick.ev3.sensor.IRSensorFactory;
@@ -13,6 +14,7 @@ import elmot.javabrick.ev3.sensor.SoundSensorFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * @author elmot
@@ -65,19 +67,30 @@ public abstract class EV3 implements AutoCloseable {
     
     
     public static void main(String[] args) throws IOException {
-        Ev3Descriptor.discoverAll();
-        Ev3Descriptor desc = Ev3Descriptor.getAllDescriptors().get(0);
-        System.err.println(desc);
+        EV3 brick = new Ev3Bluecove("0016535F47FA");
         
-        EV3 brick = desc.instantiate();
+//        Ev3Descriptor.discoverAll();
+//        Ev3Descriptor desc = Ev3Descriptor.getAllDescriptors().get(0);
+//        System.err.println(desc);        
+//        EV3 brick = desc.instantiate();
+
+        System.err.println("name: " + brick.SYSTEM.getBrickName());
+        System.err.println("again: " + brick.SYSTEM.getBrickName());
+        System.err.println("3: " + brick.SYSTEM.getBrickName());
+        System.err.println("4: " + brick.SYSTEM.getBrickName());
+        System.err.println("5: " + brick.SYSTEM.getBrickName());
         
-        brick.FILE.startProgram(FileSystem.Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf"));
-        
-        
+        String absoluteFilename = FileSystem.Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf");
+        brick.FILE.startProgram(absoluteFilename);
         
 //        brick.SYSTEM.playTone(50, 440, 500);
-//        String name = brick.SYSTEM.getBrickName();
-//        System.out.println("name: " + name);
+
+        List<FileSystem.Ev3File> files = brick.FILE.findFiles(FileSystem.PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
+        System.out.println(files);
+
+        
+//        brick.FILE.startProgram(FileSystem.Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf"));
+        
     }
 
 }

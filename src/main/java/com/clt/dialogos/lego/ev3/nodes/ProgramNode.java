@@ -69,8 +69,7 @@ public class ProgramNode extends Ev3Node {
         p.add(new JLabel(Resources.getString("ProgramName") + ':'), gbc);
         gbc.gridx++;
         gbc.weightx = 1.0;
-        final JTextComponent programName = NodePropertiesDialog.createTextField(properties,
-                        ProgramNode.PROGRAM_NAME);
+        final JTextComponent programName = NodePropertiesDialog.createTextField(properties, ProgramNode.PROGRAM_NAME);
         p.add(programName, gbc);
 
         gbc.gridx++;
@@ -80,36 +79,44 @@ public class ProgramNode extends Ev3Node {
             public void run() {
 
                 final Settings settings = (Settings) ProgramNode.this.getPluginSettings(Plugin.class);
-                
+
                 try {
                     String[] programs = new ProgressDialog(p, 200).run(new AbstractLongCallable<String[]>() {
 
-                                @Override
-                                public String getDescription() {
+                        @Override
+                        public String getDescription() {
 
-                                    return Resources.getString("RetrievingProgramNames");
-                                }
+                            return Resources.getString("RetrievingProgramNames");
+                        }
 
-                                @Override
-                                protected String[] call(ProgressListener l) throws Exception {
+                        @Override
+                        protected String[] call(ProgressListener l) throws Exception {
 
-                                    String[] programs = null;
-                                    EV3 brick = settings.createBrick(p);
-                                    
-                                    if( brick == null ) {
-                                        throw new Exception(Resources.getString("NoNxtBrickSelected"));
-                                    }
-                                    
-                                    List<FileSystem.Ev3File> files = brick.FILE.findFiles(FileSystem.PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
-                                    programs = new String[files.size()];
-                                    int i = 0;
-                                    for( FileSystem.Ev3File f : files ) {
-                                        programs[i++] = f.getRelativePathname();
-                                    }
-                                    
-                                    return programs;
-                                }
-                            });
+                            String[] programs = null;
+//                            Ev3Runtime runtime = (Ev3Runtime) ProgramNode.this.getPluginRuntime(Plugin.class, null);
+//                            EV3 brick = runtime.getBrick();
+                            EV3 brick = settings.createBrick(p);
+
+                            if (brick == null) {
+                                throw new Exception(Resources.getString("NoNxtBrickSelected"));
+                            }
+
+                            System.err.println("a"); // AKAKAK
+                            
+                            List<FileSystem.Ev3File> files = brick.FILE.findFiles(FileSystem.PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
+                            System.err.println("b");
+                            
+                            programs = new String[files.size()];
+                            int i = 0;
+                            for (FileSystem.Ev3File f : files) {
+                                programs[i++] = f.getRelativePathname();
+                            }
+                            
+                            System.err.println("c");
+
+                            return programs;
+                        }
+                    });
 
                     if (programs == null) {
                         OptionPane.error(p, Resources.getString("NoNxtBrickSelected") + ".");
@@ -118,8 +125,8 @@ public class ProgramNode extends Ev3Node {
                             OptionPane.message(p, Resources.getString("NoProgramsOnBrick"));
                         } else {
                             String program = new ListSelectionDialog<String>(p,
-                                            Resources.getString("ChooseProgram"), null,
-                                            programs).getSelectedItem();
+                                    Resources.getString("ChooseProgram"), null,
+                                    programs).getSelectedItem();
                             if (program != null) {
                                 programName.setText(program);
                             }
@@ -158,16 +165,16 @@ public class ProgramNode extends Ev3Node {
 
         try {
             Ev3Runtime runtime = (Ev3Runtime) this.getPluginRuntime(Plugin.class, comm);
-            
+
             if (runtime.getBrick() == null) {
                 throw new ExecutionException(Resources.getString("NoNxtBrickSelected"));
             }
-            
+
             runtime.getBrick().FILE.startProgram(FileSystem.Ev3File.makeFilenameRelativeToProjectRoot(program));
-            
+
             if (this.getBooleanProperty(ProgramNode.WAIT)) {
                 runtime.getBrick().FILE.waitUntilProgramTermination();
-            }            
+            }
         } catch (Exception exn) {
             throw new NodeExecutionException(this, Resources.getString("CouldNotStartProgram"), exn);
         }

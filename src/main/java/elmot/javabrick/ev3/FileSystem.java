@@ -28,7 +28,7 @@ public class FileSystem extends FactoryBase {
         super(ev3);
     }
 
-    private static final int CHUNKSIZE = 1000;
+    private static final int CHUNKSIZE = 200; // AKAKAK
 
     private static List<String> decodeResponses(ByteBuffer buf, int length, char separator) {
         byte[] arr = buf.array();

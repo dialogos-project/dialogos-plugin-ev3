@@ -5,6 +5,7 @@
  */
 package elmot.javabrick.ev3;
 
+import elmot.javabrick.ev3.bluetooth.Ev3FactoryBluecove;
 import elmot.javabrick.ev3.usb.EV3FactoryUsb;
 import elmot.javabrick.ev3.bluetooth.Ev3FactoryBluetooth;
 import java.io.IOException;
@@ -20,7 +21,8 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
     public static enum ConnectionTypes {
         USB("USB"), 
-        BLUETOOTH("Bluetooth"), 
+        BLUETOOTH("Bluetooth"),
+        BLUECOVE("Bluetooth"),
         WIFI("Wi-Fi"), 
         DUMMY("Dummy");
         
@@ -57,6 +59,8 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
                 return EV3FactoryUsb.instantiate(this);
             case BLUETOOTH:
                 return Ev3FactoryBluetooth.instantiate(this);
+            case BLUECOVE:
+                return Ev3FactoryBluecove.instantiate(this);
             default:
                 return null;
         }
@@ -65,7 +69,8 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
     public static void discoverAll() {
         allDescriptors.clear();        
         EV3FactoryUsb.discoverDevices(allDescriptors);
-        Ev3FactoryBluetooth.discoverDevices(allDescriptors);
+//        Ev3FactoryBluetooth.discoverDevices(allDescriptors);
+        Ev3FactoryBluecove.discoverDevices(allDescriptors);
     }
     
     public static List<Ev3Descriptor> getAllDescriptors() {

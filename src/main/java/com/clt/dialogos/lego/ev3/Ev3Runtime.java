@@ -72,7 +72,6 @@ public class Ev3Runtime implements PluginRuntime {
     }
 
     public EV3 getBrick() {
-
         return this.brick;
     }
 

@@ -42,6 +42,8 @@ import elmot.javabrick.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.EV3;
 import elmot.javabrick.ev3.sensor.Port;
 import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author dabo, koller
@@ -51,7 +53,8 @@ public class Settings extends PluginSettings {
     private static Collection<Ev3Descriptor> availablePorts = new TreeSet<Ev3Descriptor>();
     private DefaultEnumProperty<Ev3Descriptor> ev3;
     private Map<Port, DefaultEnumProperty<SensorType>> sensorTypes;
-    
+    private EV3 brick = null;
+
     static {
         Settings.availablePorts.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.DUMMY, "--", "--"));
     }
@@ -73,6 +76,10 @@ public class Settings extends PluginSettings {
         if (!Settings.availablePorts.isEmpty()) {
             this.ev3.setValue(Settings.availablePorts.iterator().next());
         }
+        
+        ev3.addChangeListener(e -> {
+           resetBrick(); 
+        });
 
         this.sensorTypes = new LinkedHashMap<Port, DefaultEnumProperty<SensorType>>();
         for (Port port : Port.values()) {
@@ -83,11 +90,45 @@ public class Settings extends PluginSettings {
         // updateBrickList(null, true);
     }
 
-    private void addBrick(Ev3Descriptor  desc) {
+    private void addBrick(Ev3Descriptor desc) {
         Settings.availablePorts.add(desc);
         this.ev3.setPossibleValues(this.getAvailablePorts());
         this.ev3.setValue(desc);
     }
+
+    private void resetBrick() {
+        System.err.println("reset brick");
+        
+        if( brick != null ) {
+            try {
+                brick.close();
+            } catch (IOException ex) {
+            }
+        }
+        
+        brick = null;
+    }
+
+        /*
+        try {
+            if (brick != null) {
+                brick.close();
+            }
+
+            if (ev3.getValue() == null) {
+                // change event from setPossibleValues
+                brick = null;
+            } else {
+                System.err.println("val: " + ev3.getValue());
+                brick = ev3.getValue().instantiate();
+            }
+
+            System.err.println("brick was reset");
+            System.err.println("brick now " + brick);
+        } catch (IOException ex) {
+        }
+    }
+    */
 
     private void updateBrickList(Component parent, boolean search) {
         try {
@@ -113,7 +154,7 @@ public class Settings extends PluginSettings {
                             PrintWriter pw = new PrintWriter(log, true);
 
                             boolean foundNewBrick = false;
-                            
+
                             Ev3Descriptor.discoverAll();
                             List<Ev3Descriptor> availableBricks = Ev3Descriptor.getAllDescriptors();
 
@@ -178,6 +219,7 @@ public class Settings extends PluginSettings {
 
         PropertySet<Property<?>> ps = new PropertySet<Property<?>>();
         ps.add(this.ev3);
+        
         for (DefaultEnumProperty<SensorType> sensorType : this.sensorTypes.values()) {
             ps.add(sensorType);
         }
@@ -221,9 +263,11 @@ public class Settings extends PluginSettings {
 
                         String att = atts.getValue("name");
                         String value = atts.getValue("value");
+
                         if (att.equals("factory")) {
                             try {
-                                this.factory = Settings.class.getClassLoader().loadClass(value);
+                                this.factory = Settings.class
+                                        .getClassLoader().loadClass(value);
                             } catch (ClassNotFoundException exn) {
                                 // ignore
                             }
@@ -325,7 +369,7 @@ public class Settings extends PluginSettings {
             }
             out.closeElement("att");
         }
-*/
+         */
     }
 
     public SensorType getSensorType(Port port) {
@@ -334,22 +378,25 @@ public class Settings extends PluginSettings {
     }
 
     public EV3 createBrick(Component parent) throws IOException, UserCanceledException {
-
+        System.err.printf("createBrick: val=%s\n", ev3.getValue());
         if (this.ev3.getValue() != null) {
-            return this.ev3.getValue().instantiate();
+            brick = this.ev3.getValue().instantiate();
+            return brick;
         } else {
             return null;
         }
     }
 
     @Override
-    public Ev3Runtime createRuntime(Component parent) throws Exception {
-        Map<Port, SensorType> sensorTypes = new EnumMap<Port, SensorType>(Port.class);
-        
+    public Ev3Runtime
+            createRuntime(Component parent) throws Exception {
+        Map<Port, SensorType> sensorTypes = new EnumMap<Port, SensorType>(Port.class
+        );
+
         for (Port port : this.sensorTypes.keySet()) {
             sensorTypes.put(port, this.getSensorType(port));
         }
-        
+
         return new Ev3Runtime(this.createBrick(parent), sensorTypes);
     }
 }
