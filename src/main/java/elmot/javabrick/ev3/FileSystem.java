@@ -83,9 +83,9 @@ public class FileSystem extends FactoryBase {
         cmd.put(Ev3Constants.LIST_FILES);              // byte 5: command
         cmd.putShort((short) CHUNKSIZE);               // byte 6-7: max response length
         Util.putString(path, cmd);                     // byte 8 ff.: zero-terminated path
-
+        
         cmd.flip();
-        cmd.putShort((short) cmd.limit());             // bytes 0-1: overwrite with actual message length
+        cmd.putShort((short) (cmd.limit()-2));         // bytes 0-1: overwrite with actual message length (not counting bytes 0-1 themselves)
         cmd.rewind();
 
         ByteBuffer response = brick.dataExchange(cmd, messageSeqNumber);
@@ -121,7 +121,7 @@ public class FileSystem extends FactoryBase {
             cmd.putShort((short) CHUNKSIZE);               // byte 7-8: max response length
 
             cmd.flip();
-            cmd.putShort((short) cmd.limit());             // bytes 0-1: overwrite with actual message length
+            cmd.putShort((short) (cmd.limit()-2));         // bytes 0-1: overwrite with actual message length (not counting bytes 0-1 themselves)
             cmd.rewind();
 
             response = brick.dataExchange(cmd, messageSeqNumber);

@@ -74,14 +74,14 @@ public abstract class EV3 implements AutoCloseable {
 //        System.err.println(desc);        
 //        EV3 brick = desc.instantiate();
 
-        System.err.println("name: " + brick.SYSTEM.getBrickName());
-        System.err.println("again: " + brick.SYSTEM.getBrickName());
-        System.err.println("3: " + brick.SYSTEM.getBrickName());
-        System.err.println("4: " + brick.SYSTEM.getBrickName());
-        System.err.println("5: " + brick.SYSTEM.getBrickName());
+//        System.err.println("name: " + brick.SYSTEM.getBrickName());
+//        System.err.println("again: " + brick.SYSTEM.getBrickName());
+//        System.err.println("3: " + brick.SYSTEM.getBrickName());
+//        System.err.println("4: " + brick.SYSTEM.getBrickName());
+//        System.err.println("5: " + brick.SYSTEM.getBrickName());
         
-        String absoluteFilename = FileSystem.Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf");
-        brick.FILE.startProgram(absoluteFilename);
+//        String absoluteFilename = FileSystem.Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf");
+//        brick.FILE.startProgram(absoluteFilename);
         
 //        brick.SYSTEM.playTone(50, 440, 500);
 
