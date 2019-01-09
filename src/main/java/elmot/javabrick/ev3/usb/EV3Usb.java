@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 public class EV3Usb extends EV3 implements UsbInterfacePolicy {
 
+    public static boolean SUPPRESS_WARNINGS = true;
     public static final int EV3_USB_BLOCK_SIZE = 1024;
     public static final Logger LOGGER = Logger.getLogger(EV3Usb.class.getName());
     private final UsbInterface brick;
@@ -42,14 +43,13 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
                 UsbEndpoint endpointOut = brick.getUsbEndpoint((byte) 0x1);
                 UsbPipe pipeIn = endpointIn.getUsbPipe();
                 UsbPipe pipeOut = endpointOut.getUsbPipe();
-                
+
                 pipeOut.open();
                 command.rewind();
                 command.get(dataBlock, 0, command.limit());
-                
+
 //                System.err.println("\nsend:");  // AKAKAK
-//                Ev3.hexdump(dataBlock, 100);
-                
+//                Util.hexdump(dataBlock, 100);
                 try {
                     pipeOut.syncSubmit(dataBlock);
                 } finally {
@@ -59,30 +59,33 @@ public class EV3Usb extends EV3 implements UsbInterfacePolicy {
                 try {
                     while (true) {
                         pipeIn.syncSubmit(dataBlock);
-                        
+
                         int length = 2 + (0xff & (int) dataBlock[0]) + (dataBlock[1] << 8);
-                        
+
                         // Do we need this? Let's comment out for now. - AK
                         if (length < 3 || length > 1022) {
-                            LOGGER.warning("Garbage in USB queue - skipping");
+                            if (!SUPPRESS_WARNINGS) {
+                                LOGGER.warning("Garbage in USB queue - skipping");
+                            }
                             continue;
                         }
-                        
-                        ByteBuffer response = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);                        
+
+                        ByteBuffer response = ByteBuffer.allocate(length).order(ByteOrder.LITTLE_ENDIAN);
                         response.put(dataBlock, 0, length);
 
 //                        System.err.println("\nreceived:");  // AKAKAK
 //                        Ev3.hexdump(dataBlock);
-                        
                         int readSeqNo = response.getShort(2);
                         if (readSeqNo != expectedSeqNo) {
-                            LOGGER.warning("Resynch EV3 seq no");
+                            if (!SUPPRESS_WARNINGS) {
+                                LOGGER.warning("Resynch EV3 seq no");
+                            }
+
 //                            Ev3.hexdump(dataBlock, 100);
 //                            System.err.println();
                             continue;
                         }
-                        
-                        
+
                         return response;
                     }
                 } finally {

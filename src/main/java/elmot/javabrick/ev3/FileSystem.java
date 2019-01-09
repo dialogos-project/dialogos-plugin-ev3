@@ -264,6 +264,7 @@ public class FileSystem extends FactoryBase {
 
     public void startProgram(String absoluteFilename) throws IOException {
         Command command = new Command(Ev3Constants.opFILE);
+//        command.setType(Ev3Constants.DIRECT_COMMAND_NO_REPLY);
         command.addByte(Ev3Constants.LOAD_IMAGE);
         command.addLCX(1);                      // slot
         command.addLCS(absoluteFilename);       // name

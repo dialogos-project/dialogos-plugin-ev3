@@ -51,16 +51,20 @@ public class CommandBlock {
         
         // write commands with their parameters at position 7
         buffer.position(7);
-        int globalVarCount = 0;// Local vars are not supported
+        int globalVarCount = 0;
+        int localVarCount = 0;
+        
         for (Command command : commands) {
             globalVarCount += command.getReplyByteCount();
+            localVarCount += command.getNumLocalVariables();
             command.writeTo(buffer);
         }
 
         int len = buffer.position() - 2;
         buffer.flip();
         buffer.putShort(0, (short) len);
-        buffer.putShort(5, (short) globalVarCount);
+        int memoryDeclarationHeader = globalVarCount + (localVarCount << 10);
+        buffer.putShort(5, (short) memoryDeclarationHeader);
         buffer.rewind();
 
         ByteBuffer responseBytes = brick.dataExchange(buffer, seqNumber);

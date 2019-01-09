@@ -50,15 +50,34 @@ public abstract class EV3 implements AutoCloseable {
         FILE = new FileSystem(this);
     }
 
-    public abstract void ensureOpen() throws IOException;
-
-    @Override
-    public abstract void close() throws IOException;
-
     public synchronized Response run(CommandBlock commandBlock, Class<?>[] commandParameters) throws IOException {
         ensureOpen();
         return commandBlock.run(this, commandParameters);
     }
 
+    public abstract void ensureOpen() throws IOException;
+
+    @Override
+    public abstract void close() throws IOException;
+
     public abstract ByteBuffer dataExchange(ByteBuffer bytes, int expectedSeqNo) throws IOException;
+    
+    
+    
+    public static void main(String[] args) throws IOException {
+        Ev3Descriptor.discoverAll();
+        Ev3Descriptor desc = Ev3Descriptor.getAllDescriptors().get(0);
+        System.err.println(desc);
+        
+        EV3 brick = desc.instantiate();
+        
+        brick.FILE.startProgram(FileSystem.Ev3File.makeFilenameRelativeToProjectRoot("Test/Program.rbf"));
+        
+        
+        
+//        brick.SYSTEM.playTone(50, 440, 500);
+//        String name = brick.SYSTEM.getBrickName();
+//        System.out.println("name: " + name);
+    }
+
 }

@@ -1,6 +1,5 @@
 package elmot.javabrick.ev3;
 
-import elmot.javabrick.ev3.Ev3Constants;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -16,6 +15,9 @@ public class Command {
     
     private final byte byteCode;
     private final int replyByteCount;
+    private int numLocalVariables = 0;
+    
+    private byte commandType = Ev3Constants.DIRECT_COMMAND_REPLY;
 
     private final List<byte[]> params = new ArrayList<byte[]>();
 
@@ -33,7 +35,11 @@ public class Command {
     }
 
     public byte getType() {
-        return Ev3Constants.DIRECT_COMMAND_REPLY;
+        return commandType;
+    }
+
+    public void setType(byte commandType) {
+        this.commandType = commandType;
     }
 
     public void writeTo(ByteBuffer buffer) throws IOException {
@@ -100,18 +106,12 @@ public class Command {
     
     public void addLV0(byte value) {
         addByte(PARAMETER_TYPE_VARIABLE | value);
+        numLocalVariables++;
     }
     
     public void addLV1(byte value) {
         params.add(new byte[] { (byte) 0xC1, value });
-    }
-    
-    public void addLV2(short value) {
-        params.add(new byte[] { (byte) 0xC2, (byte) (value & 255), (byte) (value >>8) });
-    }
-    
-    public void addLV4(int value) {
-        throw new UnsupportedOperationException("Not implemented yet."); // TODO implement
+        numLocalVariables++;
     }
     
     public void addLVX(int value) {
@@ -119,10 +119,12 @@ public class Command {
             addLV0((byte) value);
         } else if( value < 256 ) {
             addLV1((byte) value);
-        } else if( value < 65536 ) {
-            addLV2((short) value);
         } else {
-            addLV4(value);
+            throw new UnsupportedOperationException("Local variables that require more than one byte of memory are not supported.");
         }
+    }
+
+    public int getNumLocalVariables() {
+        return numLocalVariables;
     }
 }
