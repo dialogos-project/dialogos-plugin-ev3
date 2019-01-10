@@ -7,13 +7,10 @@ package elmot.javabrick.ev3;
 
 import elmot.javabrick.ev3.bluetooth.Ev3FactoryBluecove;
 import elmot.javabrick.ev3.usb.EV3FactoryUsb;
-import elmot.javabrick.ev3.bluetooth.Ev3FactoryBluetooth;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -23,7 +20,6 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
     public static enum ConnectionTypes {
         USB("USB"),
-        BLUETOOTH("Bluetooth"),
         BLUECOVE("Bluetooth"),
         WIFI("Wi-Fi"),
         DUMMY("Dummy");
@@ -56,15 +52,17 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
     }
 
     public EV3 instantiate() throws IOException {
+        if( connectionType == null ) {
+            throw new UnsupportedOperationException("Unknown connection type.");
+        }
+        
         switch (connectionType) {
             case USB:
                 return EV3FactoryUsb.instantiate(this);
-            case BLUETOOTH:
-                return Ev3FactoryBluetooth.instantiate(this);
             case BLUECOVE:
                 return Ev3FactoryBluecove.instantiate(this);
             default:
-                return null;
+                throw new UnsupportedOperationException("Unsupported connection type: " + connectionType.typestr);
         }
     }
 

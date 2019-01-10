@@ -17,13 +17,12 @@ dependencies {
     exclude module: 'DialogOS_MaryTTSPlugin'
   }
   runtime group:'com.github.dialogos-project', name:'dialogos', version:'2.0.6-SNAPSHOT' // more fun to test with plugins  // TODO - do I need this?
-  implementation group: "com.github.purejavacomm", name: "purejavacomm", version: "1.0.1.RELEASE" // TODO could remove it if Bluecove works reliably
+  
+  // USB
   implementation group: "org.usb4java", name: "usb4java-javax", version: "1.2.0"
   
   // modernized Bluecove snapshot, see https://github.com/abrown/bluecove/issues/134#issuecomment-89086925
   implementation(group: 'bluecove', name: 'bluecove', version: '2.1.1-20190109.150146-1')
-
-
 }
 
 mainClassName = 'com.clt.dialogos.DialogOS'
