@@ -44,7 +44,7 @@ public class Ev3FactoryBluecove {
                         descriptors.add(desc);
                     }
                 } catch (IOException ex) {
-                    Logger.getLogger(Ev3FactoryBluecove.class.getName()).log(Level.SEVERE, null, ex);
+//                    Logger.getLogger(Ev3FactoryBluecove.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 
@@ -72,7 +72,7 @@ public class Ev3FactoryBluecove {
                     inquiryCompletedEvent.wait();
                 }
             } catch (BluetoothStateException | InterruptedException ex) {
-                Logger.getLogger(Ev3FactoryBluecove.class.getName()).log(Level.SEVERE, null, ex);
+//                Logger.getLogger(Ev3FactoryBluecove.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
