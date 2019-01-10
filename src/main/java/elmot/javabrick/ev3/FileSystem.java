@@ -206,6 +206,7 @@ public class FileSystem extends FactoryBase {
         }
     }
 
+    /*
     public static void exploreFileTree(EV3 brick, String path, PrintWriter pw) throws IOException {
         List<String> subdirectories = new ArrayList<>();
         List<Ev3File> files = new ArrayList<>();
@@ -226,6 +227,7 @@ public class FileSystem extends FactoryBase {
             }
         }
     }
+    */
 
     private void forEachFileInSubtree(String directory, Consumer<Ev3File> fn) throws IOException {
         List<String> subdirectories = new ArrayList<>();
@@ -250,7 +252,7 @@ public class FileSystem extends FactoryBase {
         }
 
         forEachFileInSubtree(directory, file -> {
-            System.err.printf("%s -> %b\n", file.toString(), filter.test(file));
+//            System.err.printf("%s -> %b\n", file.toString(), filter.test(file));
 
             if (filter.test(file)) {
                 files.add(file);

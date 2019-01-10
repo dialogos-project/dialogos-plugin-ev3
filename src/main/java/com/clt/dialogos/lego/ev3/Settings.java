@@ -76,9 +76,9 @@ public class Settings extends PluginSettings {
         if (!Settings.availablePorts.isEmpty()) {
             this.ev3.setValue(Settings.availablePorts.iterator().next());
         }
-        
+
         ev3.addChangeListener(e -> {
-           resetBrick(); 
+            resetBrick();
         });
 
         this.sensorTypes = new LinkedHashMap<Port, DefaultEnumProperty<SensorType>>();
@@ -96,37 +96,63 @@ public class Settings extends PluginSettings {
         this.ev3.setValue(desc);
     }
 
+    /**
+     * If brick is changed in the dropdown menu, set the brick variable to null,
+     * so the next call to {@link #createBrick(java.awt.Component) }
+     * will open a new brick connection. If we had an active brick connection
+     * before, close it before forgetting it.
+     *
+     */
     private void resetBrick() {
-        if( brick != null ) {
+        if (brick != null) {
             try {
                 brick.close();
             } catch (IOException ex) {
             }
         }
-        
+
         brick = null;
     }
 
-        /*
-        try {
-            if (brick != null) {
-                brick.close();
-            }
+    /**
+     * Returns a brick connection based on the user's choice in the dropdown
+     * menu.
+     *
+     * @param parent
+     * @return
+     * @throws IOException
+     * @throws UserCanceledException
+     */
+    public EV3 createBrick(Component parent) throws IOException, UserCanceledException {
+        // no brick selected => return null
+        if (ev3.getValue() == null) {
+            return null;
+        }
 
-            if (ev3.getValue() == null) {
-                // change event from setPossibleValues
-                brick = null;
-            } else {
-                System.err.println("val: " + ev3.getValue());
+        if (brick != null) {
+            // Check that connection is still available. If not, reconnect.
+            try {
+                brick.SYSTEM.getBrickName();
+            } catch (Exception e) {
+//                System.err.println("connection went away, reconnect");
+
+                try {
+                    brick.close();
+                } catch (Exception e2) {
+//                    System.err.println("Additional exception during brick close: ");
+//                    e2.printStackTrace();
+                }
+
                 brick = ev3.getValue().instantiate();
             }
-
-            System.err.println("brick was reset");
-            System.err.println("brick now " + brick);
-        } catch (IOException ex) {
+        } else {
+            // If no brick was previously allocated (e.g. because resetBrick was
+            // called), create a new brick connection and cache it.
+            brick = ev3.getValue().instantiate();
         }
+
+        return brick;
     }
-    */
 
     private void updateBrickList(Component parent, boolean search) {
         try {
@@ -217,7 +243,7 @@ public class Settings extends PluginSettings {
 
         PropertySet<Property<?>> ps = new PropertySet<Property<?>>();
         ps.add(this.ev3);
-        
+
         for (DefaultEnumProperty<SensorType> sensorType : this.sensorTypes.values()) {
             ps.add(sensorType);
         }
@@ -373,16 +399,6 @@ public class Settings extends PluginSettings {
     public SensorType getSensorType(Port port) {
 
         return this.sensorTypes.get(port).getValue();
-    }
-
-    public EV3 createBrick(Component parent) throws IOException, UserCanceledException {
-//        System.err.printf("createBrick: val=%s\n", ev3.getValue());
-        if (this.ev3.getValue() != null) {
-            brick = this.ev3.getValue().instantiate();
-            return brick;
-        } else {
-            return null;
-        }
     }
 
     @Override

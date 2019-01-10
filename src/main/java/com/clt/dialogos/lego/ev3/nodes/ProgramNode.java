@@ -210,8 +210,7 @@ public class ProgramNode extends Ev3Node {
         if (!StringTools.isEmpty(program)) {
             Graph.printAtt(out, ProgramNode.PROGRAM_NAME, program);
         }
-        Graph.printAtt(out, ProgramNode.WAIT, this
-                .getBooleanProperty(ProgramNode.WAIT));
+        Graph.printAtt(out, ProgramNode.WAIT, this.getBooleanProperty(ProgramNode.WAIT));
     }
 
 }

@@ -19,7 +19,15 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.StreamConnection;
 
 /**
- *
+ * A bluetooth connection to an EV3 brick using the Bluecove library.
+ * <p>
+ * 
+ * Note: Bluecove connections can be a bit brittle. If you try to open
+ * a second Bluecove connection to the brick without closing the first one
+ * first, you may experience errors ranging from Java exceptions to
+ * hard JVM crashes with segmentation faults. Thus, be sure to close
+ * the old connection first before opening another one.
+ * 
  * @author koller
  */
 public class Ev3Bluecove extends EV3 {
