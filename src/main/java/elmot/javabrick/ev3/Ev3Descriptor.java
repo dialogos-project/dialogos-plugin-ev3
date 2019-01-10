@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -20,23 +22,23 @@ import java.util.List;
 public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
     public static enum ConnectionTypes {
-        USB("USB"), 
+        USB("USB"),
         BLUETOOTH("Bluetooth"),
         BLUECOVE("Bluetooth"),
-        WIFI("Wi-Fi"), 
+        WIFI("Wi-Fi"),
         DUMMY("Dummy");
-        
+
         private String typestr;
 
         private ConnectionTypes(String typestr) {
             this.typestr = typestr;
-        }        
+        }
     }
-    
+
     private ConnectionTypes connectionType;
     private String port;
     private String brickname;
-    
+
     private static List<Ev3Descriptor> allDescriptors = new ArrayList<>();
 
     public Ev3Descriptor(ConnectionTypes connectionType, String port, String brickname) {
@@ -52,7 +54,7 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
     public String getPort() {
         return port;
     }
-    
+
     public EV3 instantiate() throws IOException {
         switch (connectionType) {
             case USB:
@@ -65,14 +67,45 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
                 return null;
         }
     }
-    
+
+    public EV3 instantiateWithRetries(int numConnectionAttempts) throws IOException {
+        Exception lastException = null;
+
+        for (int i = 0; i < numConnectionAttempts; i++) {
+            System.err.printf("connection attempt %d ...\n", i + 1);
+
+            try {
+                EV3 brick = instantiate();
+
+                if (brick != null) {
+                    brick.SYSTEM.getBrickName();
+                    return brick;
+                }
+            } catch (Exception e) {
+//                System.err.printf("exception on connection attempt %d: %s\n", i + 1, e.getMessage());
+                lastException = e;
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                }
+            }
+        }
+
+        if (lastException != null) {
+            throw new IOException(lastException);
+        } else {
+            return null;
+        }
+    }
+
     public static void discoverAll() {
-        allDescriptors.clear();        
+        allDescriptors.clear();
         EV3FactoryUsb.discoverDevices(allDescriptors);
 //        Ev3FactoryBluetooth.discoverDevices(allDescriptors);
         Ev3FactoryBluecove.discoverDevices(allDescriptors);
     }
-    
+
     public static List<Ev3Descriptor> getAllDescriptors() {
         return allDescriptors;
     }
@@ -81,11 +114,9 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
     public String toString() {
         return String.format("%s (%s)", brickname, connectionType.typestr);
     }
-    
-
 
     @Override
     public int compareTo(Ev3Descriptor t) {
         return Comparator.comparing(Ev3Descriptor::getConnectionType).thenComparing(Ev3Descriptor::getPort).compare(this, t);
-    }    
+    }
 }

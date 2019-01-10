@@ -130,6 +130,8 @@ public class Settings extends PluginSettings {
         }
 
         if (brick != null) {
+//            System.err.println("reuse previous connection");
+            
             // Check that connection is still available. If not, reconnect.
             try {
                 brick.SYSTEM.getBrickName();
@@ -140,19 +142,39 @@ public class Settings extends PluginSettings {
                     brick.close();
                 } catch (Exception e2) {
 //                    System.err.println("Additional exception during brick close: ");
-//                    e2.printStackTrace();
+                    e2.printStackTrace();
                 }
 
-                brick = ev3.getValue().instantiate();
+                brick = ev3.getValue().instantiateWithRetries(3);
             }
         } else {
             // If no brick was previously allocated (e.g. because resetBrick was
             // called), create a new brick connection and cache it.
-            brick = ev3.getValue().instantiate();
+//            System.err.println("instantiate brick after reset");
+            brick = ev3.getValue().instantiateWithRetries(3);
         }
 
         return brick;
     }
+    
+    
+    
+    /*
+    Fehler:±class java.io.IOException±java.io.IOException: javax.bluetooth.BluetoothConnectionException: Failed to connect; [10064] Bei einem Socketvorgang ist ein Fehler aufgetreten, da der
+Zielhost nicht verfügbar war.±±Details:±elmot.javabrick.ev3.bluetooth.Ev3Bluecove.<init>(Ev3Bluecove.java:45)
+elmot.javabrick.ev3.bluetooth.Ev3FactoryBluecove.instantiate(Ev3FactoryBluecove.java:82)
+elmot.javabrick.ev3.Ev3Descriptor.instantiate(Ev3Descriptor.java:63)
+com.clt.dialogos.lego.ev3.Settings.createBrick(Settings.java:146)
+com.clt.dialogos.lego.ev3.Settings.createRuntime(Settings.java:414)
+com.clt.dialogos.lego.ev3.Settings.createRuntime(Settings.java:51)
+com.clt.dialogos.plugin.PluginSettings.initializeRuntime(PluginSettings.java:108)
+com.clt.diamant.SingleDocument$1.run(SingleDocument.java:367)
+com.clt.util.AbstractLongAction.run(AbstractLongAction.java:25)
+com.clt.util.DefaultLongAction$1.call(DefaultLongAction.java:58)
+com.clt.util.AbstractLongCallable.call(AbstractLongCallable.java:30)
+com.clt.gui.ProgressDialog$3.run(ProgressDialog.java:197)
+
+    */
 
     private void updateBrickList(Component parent, boolean search) {
         try {

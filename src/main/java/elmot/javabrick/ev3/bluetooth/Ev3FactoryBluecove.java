@@ -31,13 +31,17 @@ public class Ev3FactoryBluecove {
             @Override
             public void deviceDiscovered(RemoteDevice btDevice, DeviceClass cod) {
                 try {
+                    System.err.printf("discovered %s at port %s\n", btDevice.getFriendlyName(false), btDevice.getBluetoothAddress());
+                    
                     String port = btDevice.getBluetoothAddress();
                     Ev3Bluecove inst = new Ev3Bluecove(port);
                     String brickname = inst.SYSTEM.getBrickName();
                     inst.close();
                     
                     if (brickname != null) {
-                        descriptors.add(new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.BLUECOVE, port, brickname));
+                        Ev3Descriptor desc = new Ev3Descriptor(Ev3Descriptor.ConnectionTypes.BLUECOVE, port, brickname);
+                        System.err.println("detected: " + desc);
+                        descriptors.add(desc);
                     }
                 } catch (IOException ex) {
                     Logger.getLogger(Ev3FactoryBluecove.class.getName()).log(Level.SEVERE, null, ex);

@@ -66,13 +66,15 @@ public abstract class EV3 implements AutoCloseable {
     public abstract ByteBuffer dataExchange(ByteBuffer bytes, int expectedSeqNo) throws IOException;
 
     public static void main(String[] args) throws IOException, InterruptedException {
-//        EV3 brick = new Ev3Bluecove("0016535F47FA");
+        EV3 brick = new Ev3Bluecove("0016535F47FA");
 
-        Ev3Descriptor.discoverAll();
-        Ev3Descriptor desc = Ev3Descriptor.getAllDescriptors().get(0);
-
-        EV3 brick = desc.instantiate();
+//        Ev3Descriptor.discoverAll();
+//        Ev3Descriptor desc = Ev3Descriptor.getAllDescriptors().get(0);
+//        EV3 brick = desc.instantiate();
+        
         System.err.println(brick.SYSTEM.getBrickName());
+        
+        System.exit(0);
         
 //        brick.close();
         

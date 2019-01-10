@@ -60,7 +60,10 @@ public class Ev3Runtime implements PluginRuntime {
     }
 
     public synchronized void dispose() {
+        
+        // AK 01/2019: keep connection to EV3 alive after dialog execution ends
 
+        /*
         if (this.brick != null) {
             try {
                 this.brick.close();
@@ -69,6 +72,7 @@ public class Ev3Runtime implements PluginRuntime {
             }
             this.brick = null;
         }
+        */
     }
 
     public EV3 getBrick() {
