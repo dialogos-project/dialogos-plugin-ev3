@@ -101,9 +101,19 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
     public static void discoverAll() {
         allDescriptors.clear();
-        EV3FactoryUsb.discoverDevices(allDescriptors);
-//        Ev3FactoryBluetooth.discoverDevices(allDescriptors);
-        Ev3FactoryBluecove.discoverDevices(allDescriptors);
+
+        try {
+            EV3FactoryUsb.discoverDevices(allDescriptors);
+        } catch (Exception e) {
+            System.err.println("Exception during USB discovery: " + e.getMessage());
+        }
+
+        try {
+            Ev3FactoryBluecove.discoverDevices(allDescriptors);
+        } catch (Exception e) {
+            System.err.println("Exception during Bluetooth discovery: " + e.getMessage());
+        }
+
     }
 
     public static List<Ev3Descriptor> getAllDescriptors() {
