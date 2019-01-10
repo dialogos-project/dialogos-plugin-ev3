@@ -22,7 +22,7 @@ dependencies {
   implementation group: "org.usb4java", name: "usb4java-javax", version: "1.2.0"
   
   // modernized Bluecove snapshot, see https://github.com/abrown/bluecove/issues/134#issuecomment-89086925
-  implementation(group: 'bluecove', name: 'bluecove', version: '2.1.1-20190109.150146-1')
+  implementation(group: 'bluecove', name: 'bluecove', version: '2.1.1-20190110.191129-2')
 }
 
 mainClassName = 'com.clt.dialogos.DialogOS'
