@@ -1,12 +1,12 @@
 package elmot.javabrick.ev3.usb;
 
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.Ev3Connector;
 import elmot.javabrick.ev3.Ev3Constants;
 import elmot.javabrick.ev3.Ev3Descriptor;
 import java.io.IOException;
 
 import javax.usb.*;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +37,8 @@ public class EV3FactoryUsb {
                     UsbInterface usbInterface = device.getActiveUsbConfiguration().getUsbInterface((byte) 0);
 
                     EV3Usb inst = new EV3Usb(usbInterface);
-                    String brickname = inst.SYSTEM.getBrickName();
+                    EV3 brick = new EV3(inst);
+                    String brickname = brick.SYSTEM.getBrickName();
                     inst.close();
 
                     String port = makeUsbLocation(device);
@@ -62,10 +63,10 @@ public class EV3FactoryUsb {
         }
     }
 
-    public static EV3 instantiate(Ev3Descriptor descriptor) {
+    public static Ev3Connector instantiate(Ev3Descriptor descriptor) {
         UsbInterface intf = portsToInterfaces.get(descriptor.getPort());
-        EV3 ret = new EV3Usb(intf);
-        return ret;
+        Ev3Connector conn = new EV3Usb(intf);
+        return conn;
     }
 
     private static String makeUsbLocation(UsbDevice dev) {
@@ -79,7 +80,8 @@ public class EV3FactoryUsb {
         }
     }
 
-    private static void findDevices(UsbHub hub, short vendorId, short productId, List<EV3> targetList) {
+    /*
+    private static void findDevices(UsbHub hub, short vendorId, short productId, List<Ev3Connector> targetList) {
         //noinspection unchecked
         for (UsbDevice device : (List<UsbDevice>) hub.getAttachedUsbDevices()) {
             UsbDeviceDescriptor desc = device.getUsbDeviceDescriptor();
@@ -96,8 +98,8 @@ public class EV3FactoryUsb {
     public EV3FactoryUsb() throws SocketException {
     }
 
-    static public synchronized List<EV3> listDiscovered() {
-        ArrayList<EV3> ev3s = new ArrayList<EV3>();
+    static public synchronized List<Ev3Connector> listDiscovered() {
+        ArrayList<Ev3Connector> ev3s = new ArrayList<Ev3Connector>();
         try {
             findDevices(UsbHostManager.getUsbServices().getRootUsbHub(), (short) 0x0694, (short) 0x0005, ev3s);
         } catch (UsbException e) {
@@ -105,6 +107,7 @@ public class EV3FactoryUsb {
         }
         return ev3s;
     }
+*/
 
     public static void main(String[] args) throws IOException {
         List<Ev3Descriptor> descriptors = new ArrayList<>();

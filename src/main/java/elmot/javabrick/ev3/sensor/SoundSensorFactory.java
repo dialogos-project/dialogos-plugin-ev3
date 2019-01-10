@@ -11,8 +11,12 @@ import java.util.Collection;
  */
 public class SoundSensorFactory extends SensorFactory {
 
+    public float read(int daisyChainLevel, Port port, int modeId) throws IOException {
+        return getRead(daisyChainLevel, port, (byte) modeId);
+    }
+    
     public float read(int daisyChainLevel, Port port, SOUND_MODE mode) throws IOException {
-        return getRead(daisyChainLevel, port, (byte) mode.val);
+        return read(daisyChainLevel, port, mode.val);
     }
 
     public enum SOUND_MODE implements Mode {

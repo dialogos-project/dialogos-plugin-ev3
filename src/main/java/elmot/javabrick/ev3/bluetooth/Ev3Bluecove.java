@@ -6,6 +6,7 @@
 package elmot.javabrick.ev3.bluetooth;
 
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.Ev3Connector;
 import elmot.javabrick.ev3.Util;
 import elmot.javabrick.ev3.usb.EV3Usb;
 import static elmot.javabrick.ev3.usb.EV3Usb.LOGGER;
@@ -30,7 +31,7 @@ import javax.microedition.io.StreamConnection;
  * 
  * @author koller
  */
-public class Ev3Bluecove extends EV3 {
+public class Ev3Bluecove implements Ev3Connector {
 
     private StreamConnection c;
     private InputStream in;

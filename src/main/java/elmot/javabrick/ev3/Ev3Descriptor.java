@@ -56,14 +56,23 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
             throw new UnsupportedOperationException("Unknown connection type.");
         }
         
+        Ev3Connector conn = null;
+        
         switch (connectionType) {
             case USB:
-                return EV3FactoryUsb.instantiate(this);
+                conn = EV3FactoryUsb.instantiate(this);
+                break;
             case BLUECOVE:
-                return Ev3FactoryBluecove.instantiate(this);
+                conn = Ev3FactoryBluecove.instantiate(this);
+                break;
+            case DUMMY:
+                conn = new Ev3Dummy();
+                break;
             default:
                 throw new UnsupportedOperationException("Unsupported connection type: " + connectionType.typestr);
         }
+        
+        return new EV3(conn);
     }
 
     public EV3 instantiateWithRetries(int numConnectionAttempts) throws IOException {

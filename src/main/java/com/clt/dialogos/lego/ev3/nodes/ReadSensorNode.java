@@ -31,14 +31,19 @@ import com.clt.diamant.graph.Graph;
 import com.clt.diamant.graph.nodes.NodeExecutionException;
 import com.clt.diamant.graph.search.SearchResult;
 import com.clt.diamant.gui.NodePropertiesDialog;
+import com.clt.script.exp.Value;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.Ev3Dummy;
+import elmot.javabrick.ev3.sensor.ColorSensorFactory;
 import elmot.javabrick.ev3.sensor.Mode;
 import elmot.javabrick.ev3.sensor.Port;
 import elmot.javabrick.ev3.sensor.RawOnlySensorFactory;
 import elmot.javabrick.ev3.sensor.SensorFactory;
-import java.util.Collections;
+import elmot.javabrick.ev3.sensor.SoundSensorFactory;
+import elmot.javabrick.ev3.sensor.TouchSensorFactory;
+import elmot.javabrick.ev3.sensor.UltrasonicSensorFactory;
 
 /**
  * @author dabo
@@ -51,10 +56,6 @@ public class ReadSensorNode extends Ev3Node {
     private static final String ACTIVATE = "activate";
     private static final String VARIABLE = "variable";
 
-    // TODO:
-    // - replace SensorType by SensorFactory (= singleton for each sensor class)
-    // - implement SensorFactory#toString to get human-readable names for all the sensor types
-    // - detect sensor type on port automatically (how?)
     // Don't change names. They are written to XML
     public ReadSensorNode() {
         this.setProperty(ReadSensorNode.MODE, 0);
@@ -65,7 +66,15 @@ public class ReadSensorNode extends Ev3Node {
     public static Color getDefaultColor() {
         return new Color(255, 255, 153);
     }
-
+    
+    private Settings getSettings() {
+        return (Settings) getPluginSettings(Plugin.class);
+    }
+    
+    private EV3 getBrick() {
+        return new EV3(new Ev3Dummy());
+    }
+    
     @Override
     protected JComponent createEditorComponentImpl(final Map<String, Object> properties) {
 
@@ -79,6 +88,10 @@ public class ReadSensorNode extends Ev3Node {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(3, 3, 3, 3);
 
+        
+        
+        // dropdown for selecting sensor port
+        
         SensorPort ports[] = new SensorPort[Port.values().length];
         int i = 0;
         for (Port port : Port.values()) {
@@ -92,19 +105,21 @@ public class ReadSensorNode extends Ev3Node {
         // sensor.setSelectedItem(ports[0]);
 
         p.add(sensor, gbc);
-
-        // obsolete with EV3
-//        final JCheckBox activate = NodePropertiesDialog.createCheckBox(properties, ReadSensorNode.ACTIVATE, Resources.getString("ActivateSensor"));
-        /**
-         * // TODO add me back Sensor.Mode[] modes = new
-         * Sensor.Mode[]{Sensor.Mode.RAW, Sensor.Mode.BOOLEAN,
-         * Sensor.Mode.PERCENTAGE};
-         *
-         */
-        Collection<? extends Mode> MODES_ONLY_RAW = Collections.singletonList(RawOnlySensorFactory.MODE.RAW);
-        final JComboBox sensorMode = NodePropertiesDialog.createIntComboBox(properties, ReadSensorNode.MODE, MODES_ONLY_RAW);  // TODO -> createIntComboBox
+        
+        
+        
+        // dropdown for selecting sensor mode
+        
+        SensorType sensorType = getSettings().getSensorType(ports[0].getPort());
+        EV3 brick = getBrick();
+        Collection<? extends Mode> modes = sensorType.getModes(brick);
+        final JComboBox sensorMode = NodePropertiesDialog.createIntComboBox(properties, ReadSensorNode.MODE, modes);
         final JPanel options = new JPanel(new GridLayout(1, 1));
-
+        
+        
+        
+        // if sensor port changes, update list of possible sensor modes
+        
         ItemListener typeListener = (ItemEvent e) -> {
             if (e.getStateChange() == ItemEvent.SELECTED) {
                 SensorPort port = (SensorPort) e.getItem();
@@ -113,13 +128,13 @@ public class ReadSensorNode extends Ev3Node {
                     value = port.getType();
 
                     // replace possible modes in mode list with the ones that are appropriate for this type of sensor
-                    SensorFactory factoryAtPort = null; // TODO fixme
-                    sensorMode.removeAll();
+                    SensorType typeAtPort = getSettings().getSensorType(port.getPort());
+                    sensorMode.removeAllItems();
 
-                    if (factoryAtPort == null) {
+                    if (typeAtPort == null) {
                         sensorMode.addItem(RawOnlySensorFactory.MODE.RAW);
                     } else {
-                        for (Mode mode : factoryAtPort.getModes()) {
+                        for (Mode mode : typeAtPort.getModes(brick)) {
                             sensorMode.addItem(mode);
                         }
                     }
@@ -134,6 +149,7 @@ public class ReadSensorNode extends Ev3Node {
             }
         };
 
+        
         sensor.addItemListener(typeListener);
         typeListener.itemStateChanged(new ItemEvent(sensor,
                 ItemEvent.ITEM_STATE_CHANGED,
@@ -191,42 +207,43 @@ public class ReadSensorNode extends Ev3Node {
                 throw new NodeExecutionException(this, com.clt.diamant.Resources.getString("NoVariableAssigned"));
             }
 
-            // TODO implement me
+            Port port = sensorPort.getPort();
             int mode = getModeId();
-            SensorFactory factoryAtPort = null; // TODO fixme - get from Runtime
             SensorType type = runtime.getSensorType(sensorPort.getPort());
-
-            // TODO implement Mode#getValueClass (type Class)
-            // TODO implement method SensorFactory#readFloat(Port port,int mode) etc.
-            // -> set sensor to that mode
-            // -> read value and convert to correct class
-            // -> set variable to value of that class
+            SensorFactory factory = type.getSensor(brick);
+            factory.setMode(0, sensorPort.getPort(), mode);
+            Object value = null;
             
-
-            /*
-            Sensor sensor = new Sensor(brick, sensorPort.getPort());
-            switch (type) {
+            switch(type) {
                 case TOUCH:
-                    sensor.setType(Sensor.Type.SWITCH, mode);
+                    TouchSensorFactory tf = (TouchSensorFactory) factory;
+                    if( mode == TouchSensorFactory.TOUCH_MODE.BOOL.getId() ) {
+                        value = tf.getTouch(0, port);
+                    } else {
+                        value = tf.getBumps(0, port);
+                    }
                     break;
-                case LIGHT:
-                    sensor.setType(activate ? Sensor.Type.LIGHT_ON
-                            : Sensor.Type.LIGHT_OFF, mode);
+                    
+                case COLOR:
+                    ColorSensorFactory cf = (ColorSensorFactory) factory;
+                    value = cf.getColorAsString(port);
                     break;
+                    
                 case SOUND:
-                    sensor.setType(Sensor.Type.SOUND_DB, mode);
+                    SoundSensorFactory sf = (SoundSensorFactory) factory;
+                    value = sf.read(0, port, mode);
                     break;
+                    
                 case ULTRASONIC:
-                    sensor.setType(Sensor.Type.I2C_9V, mode);
+                    UltrasonicSensorFactory uf = (UltrasonicSensorFactory) factory;
+                    value = uf.read(0, port);
                     break;
+                    
                 default:
-                    throw new NodeExecutionException(this, Resources
-                            .getString("SensorTypeNotSet"));
+                    throw new NodeExecutionException(this, Resources.getString("SensorTypeNotSet"));
             }
-
-            int value = sensor.getValue();
-            v.setValue(new IntValue(value));
-             */
+            
+            v.setValue(Value.of(value));
         } catch (NodeExecutionException exn) {
             throw exn;
         } catch (Exception exn) {
@@ -246,8 +263,7 @@ public class ReadSensorNode extends Ev3Node {
         } else {
             SensorType type = sensor.getType();
             if ((type == null) || (type == SensorType.NONE)) {
-                this
-                        .reportError(errors, false, Resources.getString("SensorTypeNotSet"));
+                reportError(errors, false, Resources.getString("SensorTypeNotSet"));
             }
         }
 
@@ -328,6 +344,8 @@ public class ReadSensorNode extends Ev3Node {
         }
     }
 
+    // don't call from within createEditorComponentImpl; it will
+    // read from the wrong properties map
     private int getModeId() {
         return (Integer) getProperty(MODE);
 

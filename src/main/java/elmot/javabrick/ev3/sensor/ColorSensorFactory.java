@@ -13,7 +13,7 @@ import java.util.TreeMap;
  */
 public class ColorSensorFactory extends SensorFactory {
 
-    public enum COLOR implements Mode {
+    public enum COLOR {
         NONE(0), BLACK(1), BLUE(2), GREEN(3),
         YELLOW(4), RED(5), WHITE(6), BROWN(7);
         private final int val;
@@ -30,18 +30,9 @@ public class ColorSensorFactory extends SensorFactory {
             }
         }
 
-        @Override
-        public int getId() {
-            return val;
-        }
-
-        @Override
-        public String getName() {
-            return name();
-        }
     }
 
-    public enum COLOR_MODE {
+    public enum COLOR_MODE implements Mode {
         /// Use the color sensor to read reflected light
         REFLECTION(0),
         /// Use the color sensor to detect the light intensity
@@ -63,6 +54,16 @@ public class ColorSensorFactory extends SensorFactory {
         private COLOR_MODE(int val) {
             this.val = val;
         }
+
+        @Override
+        public int getId() {
+            return val;
+        }
+
+        @Override
+        public String getName() {
+            return name();
+        }
     }
 
     public ColorSensorFactory(EV3 brick) {
@@ -81,15 +82,19 @@ public class ColorSensorFactory extends SensorFactory {
         }
         return color;
     }
+    
+    public String getColorAsString(Port port) throws IOException {
+        return getColor(port).name();
+    }
 
     @Override
     public Collection<? extends Mode> getModes() {
-        return Arrays.asList(COLOR.values());
+        return Arrays.asList(COLOR_MODE.values());
     }
 
     @Override
     public Mode decodeMode(String modename) {
-        return COLOR.valueOf(modename);
+        return COLOR_MODE.valueOf(modename);
     }
 
 }

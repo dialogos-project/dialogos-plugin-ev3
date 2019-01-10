@@ -40,7 +40,7 @@ public abstract class SensorFactory extends FactoryBase {
         return response.getFloat(0);
     }
 
-    protected void setMode(int daisyChainLevel, Port port, int mode) throws IOException {
+    public void setMode(int daisyChainLevel, Port port, int mode) throws IOException {
         Command command = new Command(0x9d, 4);
         command.addByte(daisyChainLevel);
         command.addByte(port.portNum);
