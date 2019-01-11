@@ -16,4 +16,9 @@ public class TemperatureSensorFactory extends RawOnlySensorFactory {
     public TemperatureSensorFactory(EV3 brick) {
         super(brick);
     }
+
+    @Override
+    public Object readValue(Port port) throws IOException {
+        return read(0, port);
+    }
 }

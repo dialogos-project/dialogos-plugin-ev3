@@ -44,6 +44,7 @@ import elmot.javabrick.ev3.sensor.SensorFactory;
 import elmot.javabrick.ev3.sensor.SoundSensorFactory;
 import elmot.javabrick.ev3.sensor.TouchSensorFactory;
 import elmot.javabrick.ev3.sensor.UltrasonicSensorFactory;
+import java.io.IOException;
 
 /**
  * @author dabo
@@ -211,37 +212,8 @@ public class ReadSensorNode extends Ev3Node {
             int mode = getModeId();
             SensorType type = runtime.getSensorType(sensorPort.getPort());
             SensorFactory factory = type.getSensor(brick);
-            factory.setMode(0, sensorPort.getPort(), mode);
-            Object value = null;
-            
-            switch(type) {
-                case TOUCH:
-                    TouchSensorFactory tf = (TouchSensorFactory) factory;
-                    if( mode == TouchSensorFactory.TOUCH_MODE.BOOL.getId() ) {
-                        value = tf.getTouch(0, port);
-                    } else {
-                        value = tf.getBumps(0, port);
-                    }
-                    break;
-                    
-                case COLOR:
-                    ColorSensorFactory cf = (ColorSensorFactory) factory;
-                    value = cf.getColorAsString(port);
-                    break;
-                    
-                case SOUND:
-                    SoundSensorFactory sf = (SoundSensorFactory) factory;
-                    value = sf.read(0, port, mode);
-                    break;
-                    
-                case ULTRASONIC:
-                    UltrasonicSensorFactory uf = (UltrasonicSensorFactory) factory;
-                    value = uf.read(0, port);
-                    break;
-                    
-                default:
-                    throw new NodeExecutionException(this, Resources.getString("SensorTypeNotSet"));
-            }
+            factory.setMode(0, port, mode);
+            Object value = factory.readValue(port);
             
             v.setValue(Value.of(value));
         } catch (NodeExecutionException exn) {

@@ -6,20 +6,21 @@
 package elmot.javabrick.ev3.sensor;
 
 import elmot.javabrick.ev3.EV3;
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * A sensor that only has a RAW mode.
- * 
+ *
  * @author koller
  */
 public class RawOnlySensorFactory extends SensorFactory {
-     protected RawOnlySensorFactory(EV3 ev3) {
+
+    protected RawOnlySensorFactory(EV3 ev3) {
         super(ev3);
     }
-     
-    
+
     public enum MODE implements Mode {
         RAW(0);
 
@@ -41,7 +42,7 @@ public class RawOnlySensorFactory extends SensorFactory {
     }
 
     @Override
-    public Collection<? extends Mode> getModes() {
+    public List<? extends Mode> getModes() {
         return Arrays.asList(MODE.values());
     }
 
@@ -50,4 +51,8 @@ public class RawOnlySensorFactory extends SensorFactory {
         return MODE.valueOf(modename);
     }
 
+    @Override
+    public Object readValue(Port port) throws IOException {
+        return readRaw(0, port);
+    }
 }

@@ -4,7 +4,7 @@ import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -70,9 +70,11 @@ public class ColorSensorFactory extends SensorFactory {
         super(brick);
     }
 
+    /*
     public void setMode(int daisyChainLevel, Port port, COLOR_MODE mode) throws IOException {
         setMode(daisyChainLevel, port, mode.val);
     }
+*/
 
     public COLOR getColor(Port port) throws IOException {
         Integer colorIndex = Integer.valueOf(readRaw(0, port));
@@ -82,13 +84,13 @@ public class ColorSensorFactory extends SensorFactory {
         }
         return color;
     }
-    
+
     public String getColorAsString(Port port) throws IOException {
         return getColor(port).name();
     }
 
     @Override
-    public Collection<? extends Mode> getModes() {
+    public List<? extends Mode> getModes() {
         return Arrays.asList(COLOR_MODE.values());
     }
 
@@ -97,4 +99,8 @@ public class ColorSensorFactory extends SensorFactory {
         return COLOR_MODE.valueOf(modename);
     }
 
+    @Override
+    public Object readValue(Port port) throws IOException {
+        return getColor(port);
+    }
 }

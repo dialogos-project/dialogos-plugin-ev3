@@ -4,16 +4,18 @@ import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author elmot
  */
 public class UltrasonicSensorFactory extends SensorFactory {
 
+    /*
     public void setMode(int daisyChainLevel, Port port, ULTRASONIC_MODE mode) throws IOException {
         setMode(daisyChainLevel, port, mode.val);
     }
+*/
 
     public float read(int daisyChainLevel, Port port) throws IOException {
         return readRaw(daisyChainLevel, port);
@@ -51,12 +53,17 @@ public class UltrasonicSensorFactory extends SensorFactory {
     
     
     @Override
-    public Collection<? extends Mode> getModes() {
+    public List<? extends Mode> getModes() {
         return Arrays.asList(ULTRASONIC_MODE.values());
     }
 
     @Override
     public Mode decodeMode(String modename) {
         return ULTRASONIC_MODE.valueOf(modename);
+    }
+
+    @Override
+    public Object readValue(Port port) throws IOException {
+        return readSI(0, port, getModeId());
     }
 }

@@ -6,13 +6,12 @@ import elmot.javabrick.ev3.FactoryBase;
 import elmot.javabrick.ev3.Response;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author elmot
  */
 public abstract class SensorFactory extends FactoryBase {
-
     public static final int CMD_INPUT_DEVICE = 0x99;
     public static final int CMD_INPUT_READ = 0x9a;
     public static final int CMD_INPUT_READ_SI = 0x9d;
@@ -23,12 +22,13 @@ public abstract class SensorFactory extends FactoryBase {
     public static final int SUBCMD_CLR_CHANGES = 26;
     public static final int SUBCMD_READ_SI = 29;
     public static final int SUBCMD_GET_BUMPS = 31;
-
-
+    
+    private int modeId = 0;
+    
     protected SensorFactory(EV3 ev3) {
         super(ev3);
     }
-    
+
     protected float readSI(int daisyChainLevel, Port port, int mode) throws IOException {
         Command command = new Command(CMD_INPUT_READ_SI, 4);
         command.addByte(daisyChainLevel);
@@ -41,6 +41,8 @@ public abstract class SensorFactory extends FactoryBase {
     }
 
     public void setMode(int daisyChainLevel, Port port, int mode) throws IOException {
+        this.modeId = mode;
+        
         Command command = new Command(0x9d, 4);
         command.addByte(daisyChainLevel);
         command.addByte(port.portNum);
@@ -48,6 +50,14 @@ public abstract class SensorFactory extends FactoryBase {
         command.addByte(mode);
         command.addShortGlobalVariable(0);
         run(command);
+    }
+    
+    protected int getModeId() {
+        return modeId;
+    }
+    
+    protected Mode getMode() {
+        return getModes().get(getModeId());
     }
 
     public void stopAll(int daisyLevel) throws IOException {
@@ -95,19 +105,29 @@ public abstract class SensorFactory extends FactoryBase {
         Response run = run(command, byte.class);
         return run.getInt(0);
     }
-    
-    public abstract Collection<? extends Mode> getModes();
-    
-    public abstract Mode decodeMode(String modename);
-    
+
     public Mode decodeMode(int modeId) {
-        for( Mode mode : getModes() ) {
-            if( mode.getId() == modeId ) {
+        for (Mode mode : getModes()) {
+            if (mode.getId() == modeId) {
                 return mode;
             }
         }
-        
+
         return null;
     }
 
+    public abstract List<? extends Mode> getModes();
+    public abstract Mode decodeMode(String modename);
+
+    /**
+     * Returns a value for a sensor of this type at the
+     * given port. The type of value depends on the sensor
+     * and on the mode to which it was set using prior calls
+     * to {@link #setMode(int, elmot.javabrick.ev3.sensor.Port, int) }.
+     * 
+     * @param port
+     * @return
+     * @throws IOException 
+     */
+    public abstract Object readValue(Port port) throws IOException;
 }

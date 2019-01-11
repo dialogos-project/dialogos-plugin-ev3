@@ -4,13 +4,12 @@ import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author elmot
  */
 public class IRSensorFactory extends SensorFactory {
-
     public enum IR_MODE implements Mode {
         /// Use the IR sensor as a distance sensor
         PROXIMITY(0),
@@ -36,9 +35,12 @@ public class IRSensorFactory extends SensorFactory {
         }
     }
 
+    /*
     public void setMode(int daisyChainLevel, Port port, IR_MODE mode) throws IOException {
         setMode(daisyChainLevel, port, mode.val);
+        this.mode = mode;
     }
+*/
 
     public IRSensorFactory(EV3 ev3) {
         super(ev3);
@@ -51,13 +53,13 @@ public class IRSensorFactory extends SensorFactory {
     public int readSeek(int daisyChainLevel, Port port) throws IOException {
         return readRaw(daisyChainLevel, port);
     }
+
     public int readRemote(int daisyChainLevel, Port port) throws IOException {
         return readRaw(daisyChainLevel, port);
     }
-    
-    
+
     @Override
-    public Collection<? extends Mode> getModes() {
+    public List<? extends Mode> getModes() {
         return Arrays.asList(IR_MODE.values());
     }
 
@@ -65,4 +67,21 @@ public class IRSensorFactory extends SensorFactory {
     public Mode decodeMode(String modename) {
         return IR_MODE.valueOf(modename);
     }
+
+    @Override
+    public Object readValue(Port port) throws IOException {
+        IR_MODE irm = (IR_MODE) getMode();
+        
+        switch(irm) {
+            case PROXIMITY:
+                return readProximity(0, port);
+            case REMOTE:
+                return readRemote(0, port);
+            case SEEK:
+                return readSeek(0, port);
+        }
+        
+        return null;
+    }
+
 }

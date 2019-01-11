@@ -4,7 +4,7 @@ import elmot.javabrick.ev3.EV3;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 /**
  * @author elmot
@@ -15,9 +15,11 @@ public class SoundSensorFactory extends SensorFactory {
         return getRead(daisyChainLevel, port, (byte) modeId);
     }
     
+    /*
     public float read(int daisyChainLevel, Port port, SOUND_MODE mode) throws IOException {
         return read(daisyChainLevel, port, mode.val);
     }
+*/
 
     public enum SOUND_MODE implements Mode {
         SOUND_DB(0),
@@ -46,13 +48,18 @@ public class SoundSensorFactory extends SensorFactory {
     
     
     @Override
-    public Collection<? extends Mode> getModes() {
+    public List<? extends Mode> getModes() {
         return Arrays.asList(SOUND_MODE.values());
     }
 
     @Override
     public Mode decodeMode(String modename) {
         return SOUND_MODE.valueOf(modename);
+    }
+
+    @Override
+    public Object readValue(Port port) throws IOException {
+        return read(0, port, getModeId());
     }
 
 }
