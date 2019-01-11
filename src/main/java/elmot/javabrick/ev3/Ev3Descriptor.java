@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -135,5 +137,21 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
     @Override
     public int compareTo(Ev3Descriptor t) {
         return Comparator.comparing(Ev3Descriptor::getConnectionType).thenComparing(Ev3Descriptor::getPort).compare(this, t);
+    }
+    
+    public String serialize() {
+        return String.format("%s:%s:%s", connectionType.name(), brickname, port);
+    }
+    
+    private static final Pattern DESERIALIZATION_PATTERN = Pattern.compile("([^:]*):([^:]*):(.*)");
+    
+    public static Ev3Descriptor deserialize(String serializedRepresentation) {
+        Matcher m = DESERIALIZATION_PATTERN.matcher(serializedRepresentation);
+        
+        if( m.matches() ) {
+            return new Ev3Descriptor(ConnectionTypes.valueOf(m.group(1)), m.group(3), m.group(2));
+        } else {
+            return null;
+        }
     }
 }

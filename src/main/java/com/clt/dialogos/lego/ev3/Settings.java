@@ -24,11 +24,13 @@ import org.xml.sax.SAXException;
 
 import com.clt.dialogos.plugin.PluginSettings;
 import com.clt.diamant.IdMap;
+import com.clt.diamant.graph.Graph;
 import com.clt.event.ProgressListener;
 import com.clt.gui.OptionPane;
 import com.clt.gui.ProgressDialog;
 import com.clt.io.InterfaceType;
 import com.clt.properties.DefaultEnumProperty;
+import com.clt.properties.EnumProperty;
 import com.clt.properties.Property;
 import com.clt.properties.PropertySet;
 import com.clt.util.AbstractLongAction;
@@ -40,8 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 import elmot.javabrick.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.EV3;
+import elmot.javabrick.ev3.Ev3Connector;
 import elmot.javabrick.ev3.sensor.Port;
 import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author dabo, koller
@@ -266,147 +271,60 @@ public class Settings extends PluginSettings {
 
         return p;
     }
-
+    
     @Override
-    protected void readAttribute(final XMLReader r, String name, String value,
-            IdMap uid_map) {
-
-        if (name.equals("nxt")) {
-            r.setHandler(new AbstractHandler("att") {
-
-                private Class<?> factory = null;
-                private String brickName = null;
-                private String uri = null;
-                private InterfaceType type = null;
-                private String port = null;
-
-                @Override
-                protected void start(String name, Attributes atts) {
-
-                    if (name.equals("att")) {
-                        r.setHandler(new AbstractHandler("att"));
-
-                        String att = atts.getValue("name");
-                        String value = atts.getValue("value");
-
-                        if (att.equals("factory")) {
-                            try {
-                                this.factory = Settings.class
-                                        .getClassLoader().loadClass(value);
-                            } catch (ClassNotFoundException exn) {
-                                // ignore
-                            }
-                        } else if (att.equals("name")) {
-                            this.brickName = value;
-                        } else if (att.equals("type")) {
-                            this.type = InterfaceType.valueOf(value);
-                        } else if (att.equals("port")) {
-                            this.port = value;
-                        } else if (att.equals("uri")) {
-                            this.uri = value;
-                        }
-                    }
-                }
-
-                @SuppressWarnings("unchecked")
-                @Override
-                protected void end(String name) throws SAXException {
-                    // TODO implement me
-//
-//                    try {
-//                        BrickDescription desc
-//                                = (BrickDescription) this.factory.getConstructor(
-//                                        new Class[]{String.class, NxtDeviceInfo.class,
-//                                            InterfaceType.class, String.class}).newInstance(
-//                                                new Object[]{this.uri,
-//                                                    new NxtDeviceInfo(this.brickName, null, null, 0, 0, 0),
-//                                                    this.type,
-//                                                    this.port});
-//                        Settings.this.addBrick(desc);
-//                        Settings.this.ev3.setValue(desc);
-//                    } catch (Exception exn) {
-//                        r.raiseException(exn);
-//                    }
-                }
-            });
-        } else if (name.equals("sensor")) {
-            r.setHandler(new AbstractHandler("att") {
-
-                @Override
-                protected void start(String name, Attributes atts) throws SAXException {
-
-                    if (name.equals("att")) {
-                        r.setHandler(new AbstractHandler("att"));
-
-                        String sensor = atts.getValue("name");
-                        String value = atts.getValue("value");
-
-                        int sensorID = -1;
-                        try {
-                            sensorID = Integer.parseInt(sensor);
-                        } catch (Exception exn) {
-                            r.raiseException(exn);
-                        }
-
-                        Port port = null;
-                        for (Port p : Port.values()) {
-                            if (p.portNum == sensorID) {
-                                port = p;
-                            }
-                        }
-                        SensorType type = null;
-                        for (SensorType t : SensorType.values()) {
-                            if (t.name().equals(value)) {
-                                type = t;
-                            }
-                        }
-                        if ((port != null) && (type != null)) {
-                            Settings.this.sensorTypes.get(port).setValue(type);
-                        }
-                    }
-                }
-            });
+    protected void readAttribute(final XMLReader r, String name, String value, IdMap uid_map) {
+        if( name.equals("ev3")) {
+            Ev3Descriptor desc = Ev3Descriptor.deserialize(value);
+            
+            if( desc != null ) {
+                try {
+                    // try to reconnect
+                    EV3 brick = desc.instantiate();
+                    brick.SYSTEM.getBrickName();
+                    
+                    // reconnection worked, add to brick list
+                    availablePorts.clear();
+                    availablePorts.add(desc);
+                    
+                    Ev3Descriptor[] available = getAvailablePorts();                    
+                    ev3.setPossibleValues(available);                    
+                    ev3.setValue(desc);                    
+                } catch (Exception ex) {
+                    // reconnecting didn't work => just stay with "Dummy"
+                }                
+            }
+        } else {
+            Port port = Port.valueOf(name);
+            SensorType type = SensorType.valueOf(value);
+            setSensorType(port, type);
         }
     }
 
     @Override
     public void writeAttributes(XMLWriter out, IdMap uidMap) {
-        // TODO implement me
-
-        /*
-        BrickDescription nxt = this.ev3.getValue();
-        if ((nxt != null) && (nxt.getInterfaceType() != null)) {
-            Graph.printAtt(out, "nxt", "nxt", null);
-            Graph.printAtt(out, "factory", nxt.getClass().getName());
-            Graph.printAtt(out, "name", nxt.getBrickName());
-            Graph.printAtt(out, "type", nxt.getInterfaceType().name());
-            if (nxt.getPort() != null) {
-                Graph.printAtt(out, "port", nxt.getPort());
+        Ev3Descriptor desc = ev3.getValue();
+        
+        if( desc != null ) {
+            Graph.printAtt(out, "ev3", desc.serialize());
+            for( Port port : Port.values() ) {
+                Graph.printAtt(out, port.name(), getSensorType(port).name());
             }
-            Graph.printAtt(out, "uri", nxt.getURI());
-            out.closeElement("att");
-
-            Graph.printAtt(out, "sensor", "sensor", null);
-            for (Sensor.Port port : this.sensorTypes.keySet()) {
-                Graph.printAtt(out, String.valueOf(port.getID()), this.sensorTypes.get(
-                        port).getValue()
-                        .name());
-            }
-            out.closeElement("att");
         }
-         */
     }
 
     public SensorType getSensorType(Port port) {
-
-        return this.sensorTypes.get(port).getValue();
+        return sensorTypes.get(port).getValue();
+    }
+    
+    public void setSensorType(Port port, SensorType type) {
+        EnumProperty<SensorType> prop = sensorTypes.get(port);
+        prop.setValue(type);
     }
 
     @Override
-    public Ev3Runtime
-            createRuntime(Component parent) throws Exception {
-        Map<Port, SensorType> sensorTypes = new EnumMap<Port, SensorType>(Port.class
-        );
+    public Ev3Runtime createRuntime(Component parent) throws Exception {
+        Map<Port, SensorType> sensorTypes = new EnumMap<Port, SensorType>(Port.class);
 
         for (Port port : this.sensorTypes.keySet()) {
             sensorTypes.put(port, this.getSensorType(port));

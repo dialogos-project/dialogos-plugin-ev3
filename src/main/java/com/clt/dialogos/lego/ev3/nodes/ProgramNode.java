@@ -188,10 +188,7 @@ public class ProgramNode extends Ev3Node {
     }
 
     @Override
-    protected void readAttribute(XMLReader r, String name, String value,
-            IdMap uid_map)
-            throws SAXException {
-
+    protected void readAttribute(XMLReader r, String name, String value, IdMap uid_map) throws SAXException {
         if (name.equals(ProgramNode.PROGRAM_NAME)) {
             this.setProperty(ProgramNode.PROGRAM_NAME, value);
         } else if (name.equals(ProgramNode.WAIT)) {

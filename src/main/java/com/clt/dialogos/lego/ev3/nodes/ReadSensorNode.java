@@ -36,15 +36,12 @@ import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import elmot.javabrick.ev3.EV3;
 import elmot.javabrick.ev3.Ev3Dummy;
-import elmot.javabrick.ev3.sensor.ColorSensorFactory;
 import elmot.javabrick.ev3.sensor.Mode;
 import elmot.javabrick.ev3.sensor.Port;
 import elmot.javabrick.ev3.sensor.RawOnlySensorFactory;
 import elmot.javabrick.ev3.sensor.SensorFactory;
-import elmot.javabrick.ev3.sensor.SoundSensorFactory;
-import elmot.javabrick.ev3.sensor.TouchSensorFactory;
-import elmot.javabrick.ev3.sensor.UltrasonicSensorFactory;
-import java.io.IOException;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @author dabo
@@ -78,7 +75,6 @@ public class ReadSensorNode extends Ev3Node {
     
     @Override
     protected JComponent createEditorComponentImpl(final Map<String, Object> properties) {
-
         final JPanel p = new JPanel(new GridBagLayout());
         p.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
@@ -102,7 +98,7 @@ public class ReadSensorNode extends Ev3Node {
         p.add(new JLabel(Resources.getString("SensorPort") + ':'), gbc);
         gbc.gridx++;
         final JComboBox sensor = NodePropertiesDialog.createComboBox(properties, ReadSensorNode.SENSOR, ports);
-        this.setProperty(ReadSensorNode.SENSOR, ports[0]);
+//        this.setProperty(ReadSensorNode.SENSOR, ports[0]); // don't overwrite previously selected port
         // sensor.setSelectedItem(ports[0]);
 
         p.add(sensor, gbc);
@@ -111,7 +107,8 @@ public class ReadSensorNode extends Ev3Node {
         
         // dropdown for selecting sensor mode
         
-        SensorType sensorType = getSettings().getSensorType(ports[0].getPort());
+        SensorPort sp = (SensorPort) properties.get(SENSOR);
+        SensorType sensorType = getSettings().getSensorType(sp.getPort());
         EV3 brick = getBrick();
         Collection<? extends Mode> modes = sensorType.getModes(brick);
         final JComboBox sensorMode = NodePropertiesDialog.createIntComboBox(properties, ReadSensorNode.MODE, modes);
@@ -320,9 +317,8 @@ public class ReadSensorNode extends Ev3Node {
     // read from the wrong properties map
     private int getModeId() {
         return (Integer) getProperty(MODE);
-
     }
-
+    
     private class SensorPort {
 
         private Port port;
