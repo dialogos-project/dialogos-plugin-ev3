@@ -28,11 +28,11 @@ import com.clt.xml.XMLWriter;
  */
 public class StopProgramNode extends Ev3Node {
 
-    private static final String CHECK_RUNNING = "checkRunning";
+//    private static final String CHECK_RUNNING = "checkRunning";
 
     public StopProgramNode() {
 
-        this.setProperty(StopProgramNode.CHECK_RUNNING, Boolean.FALSE);
+//        this.setProperty(StopProgramNode.CHECK_RUNNING, Boolean.FALSE);
         this.addEdge(Resources.getString("ProgramStopped"));
     }
 
@@ -41,16 +41,16 @@ public class StopProgramNode extends Ev3Node {
 
         JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
-        p.add(NodePropertiesDialog.createCheckBox(properties,
-                StopProgramNode.CHECK_RUNNING,
-                Resources.getString("CheckIfRunning")));
+//        p.add(NodePropertiesDialog.createCheckBox(properties,
+//                StopProgramNode.CHECK_RUNNING,
+//                Resources.getString("CheckIfRunning")));
 
         return p;
     }
 
+    /*
     @Override
     public boolean editProperties(Component parent) {
-
         boolean oldCheck = this.getBooleanProperty(StopProgramNode.CHECK_RUNNING);
         if (super.editProperties(parent)) {
             boolean newCheck = this.getBooleanProperty(StopProgramNode.CHECK_RUNNING);
@@ -66,6 +66,7 @@ public class StopProgramNode extends Ev3Node {
             return false;
         }
     }
+*/
 
     @Override
     protected int executeEv3(WozInterface comm) {
@@ -78,6 +79,7 @@ public class StopProgramNode extends Ev3Node {
             
             runtime.getBrick().FILE.stopProgram();
             
+            /*
             boolean check = this.getBooleanProperty(StopProgramNode.CHECK_RUNNING);
             
             if( check ) {
@@ -86,6 +88,7 @@ public class StopProgramNode extends Ev3Node {
                     return 1;
                 }
             }
+*/
             
             return 0;
         } catch (Exception exn) {
@@ -93,10 +96,9 @@ public class StopProgramNode extends Ev3Node {
         }
     }
 
+    /*
     @Override
-    protected void readAttribute(XMLReader r, String name, String value,
-            IdMap uid_map)
-            throws SAXException {
+    protected void readAttribute(XMLReader r, String name, String value, IdMap uid_map)            throws SAXException {
 
         if (name.equals(StopProgramNode.CHECK_RUNNING)) {
             boolean check = value.equalsIgnoreCase("1");
@@ -114,5 +116,6 @@ public class StopProgramNode extends Ev3Node {
             Graph.printAtt(out, StopProgramNode.CHECK_RUNNING, true);
         }
     }
+*/
 
 }
