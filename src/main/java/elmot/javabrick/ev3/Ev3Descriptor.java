@@ -85,14 +85,9 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
             try {
                 EV3 brick = instantiate();
-                
-                System.err.println("brick:");
-                System.err.println(brick);
 
                 if (brick != null) {
-                    System.err.println("not null");
-                    System.err.println(brick.SYSTEM);
-                    brick.SYSTEM.getBrickName();
+                    brick.getBrickname();
                     return brick;
                 }
             } catch (Exception e) {
