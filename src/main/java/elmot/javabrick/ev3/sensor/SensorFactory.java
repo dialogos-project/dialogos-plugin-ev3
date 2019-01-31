@@ -60,7 +60,7 @@ public abstract class SensorFactory extends FactoryBase {
         return getModes().get(getModeId());
     }
 
-    public void stopAll(int daisyLevel) throws IOException {
+    protected void stopAll(int daisyLevel) throws IOException {
         Command command = new Command(CMD_INPUT_DEVICE, 0);
         command.addByte(SUBCMD_STOP_ALL);
         command.addByte(daisyLevel);
@@ -87,7 +87,7 @@ public abstract class SensorFactory extends FactoryBase {
         return response.getByte(0);
     }
 
-    public void clearChanges(int daisyLevel, Port port) throws IOException {
+    protected void clearChanges(int daisyLevel, Port port) throws IOException {
         Command command = new Command(CMD_INPUT_DEVICE, 4);
         command.addByte(SUBCMD_CLR_CHANGES);
         command.addByte(daisyLevel);
