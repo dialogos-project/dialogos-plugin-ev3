@@ -36,7 +36,7 @@ public class EV3FactoryUsb {
                     UsbInterface usbInterface = device.getActiveUsbConfiguration().getUsbInterface((byte) 0);
 
                     EV3 brick = new EV3Usb(usbInterface);
-                    String brickname = brick.SYSTEM.getBrickName();
+                    String brickname = brick.getBrickname();
                     brick.close();
 
                     String port = makeUsbLocation(device);
@@ -111,7 +111,7 @@ public class EV3FactoryUsb {
         List<Ev3Descriptor> descriptors = new ArrayList<>();
         discoverDevices(descriptors);
         
-        String x=descriptors.get(0).instantiate().SYSTEM.getBrickName();
+        String x=descriptors.get(0).instantiate().getBrickname();
         System.out.println(x);
     }
 }

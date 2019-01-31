@@ -130,7 +130,7 @@ public class Settings extends PluginSettings {
             
             // Check that connection is still available. If not, reconnect.
             try {
-                brick.SYSTEM.getBrickName();
+                brick.getBrickname();
             } catch (Exception e) {
 //                System.err.println("connection went away, reconnect");
 
@@ -274,7 +274,7 @@ public class Settings extends PluginSettings {
                 try {
                     // try to reconnect
                     EV3 brick = desc.instantiate();
-                    brick.SYSTEM.getBrickName();
+                    brick.getBrickname();
                     
                     // reconnection worked, add to brick list
                     availablePorts.clear();

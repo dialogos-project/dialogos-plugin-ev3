@@ -1,26 +1,19 @@
 package com.clt.dialogos.lego.ev3.nodes;
 
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import org.xml.sax.SAXException;
 
 import com.clt.dialogos.lego.ev3.Ev3Node;
 import com.clt.dialogos.lego.ev3.Ev3Runtime;
 import com.clt.dialogos.lego.ev3.Plugin;
 import com.clt.dialogos.lego.ev3.Resources;
-import com.clt.diamant.IdMap;
 import com.clt.diamant.WozInterface;
-import com.clt.diamant.graph.Graph;
 import com.clt.diamant.graph.nodes.NodeExecutionException;
-import com.clt.diamant.gui.NodePropertiesDialog;
 import com.clt.script.cmd.ExecutionException;
-import com.clt.xml.XMLReader;
-import com.clt.xml.XMLWriter;
 
 /**
  * @author dabo
@@ -77,7 +70,7 @@ public class StopProgramNode extends Ev3Node {
                 throw new ExecutionException(Resources.getString("NoNxtBrickSelected"));
             }
             
-            runtime.getBrick().FILE.stopProgram();
+            runtime.getBrick().stopProgram();
             
             /*
             boolean check = this.getBooleanProperty(StopProgramNode.CHECK_RUNNING);

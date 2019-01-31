@@ -88,26 +88,26 @@ public class MotorNode extends Ev3Node {
             }
             
             int power = Integer.parseInt((String) getProperty(POWER));
-            brick.MOTOR.speed(motorSet, power);
+            brick.setMotorSpeed(motorSet, power);
             
             switch(state) {
                 case FORWARD:
-                    brick.MOTOR.direction(motorSet, MotorFactory.DIR.FORWARD);
-                    brick.MOTOR.start(motorSet);
+                    brick.setMotorDirection(motorSet, MotorFactory.DIR.FORWARD);
+                    brick.startMotor(motorSet);
                     break;
                     
                     
                 case BACKWARD:
-                    brick.MOTOR.direction(motorSet, MotorFactory.DIR.BACK);
-                    brick.MOTOR.start(motorSet);
+                    brick.setMotorDirection(motorSet, MotorFactory.DIR.BACK);
+                    brick.startMotor(motorSet);
                     break;
                     
                 case STOP:
-                    brick.MOTOR.stop(motorSet, MotorFactory.BRAKE.BRAKE);
+                    brick.stopMotor(motorSet, MotorFactory.BRAKE.BRAKE);
                     break;
                     
                 case DRIFT:
-                    brick.MOTOR.stop(motorSet, MotorFactory.BRAKE.COAST);
+                    brick.stopMotor(motorSet, MotorFactory.BRAKE.COAST);
                     break;                    
             }
         } catch (NodeExecutionException exn) {

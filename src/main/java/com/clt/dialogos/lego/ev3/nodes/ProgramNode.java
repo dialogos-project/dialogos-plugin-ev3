@@ -101,7 +101,7 @@ public class ProgramNode extends Ev3Node {
                                 throw new Exception(Resources.getString("NoNxtBrickSelected"));
                             }
                             
-                            List<FileSystem.Ev3File> files = brick.FILE.findFiles(FileSystem.PROJECT_ROOT, file -> file.getName().toLowerCase().endsWith(".rbf"));
+                            List<FileSystem.Ev3File> files = brick.findPrograms();
                             
                             programs = new String[files.size()];
                             int i = 0;
@@ -165,10 +165,10 @@ public class ProgramNode extends Ev3Node {
                 throw new ExecutionException(Resources.getString("NoNxtBrickSelected"));
             }
 
-            runtime.getBrick().FILE.startProgram(FileSystem.Ev3File.makeFilenameRelativeToProjectRoot(program));
+            runtime.getBrick().startProgram(program);
 
             if (this.getBooleanProperty(ProgramNode.WAIT)) {
-                runtime.getBrick().FILE.waitUntilProgramTermination();
+                runtime.getBrick().waitUntilProgramTermination();
             }
         } catch (Exception exn) {
             throw new NodeExecutionException(this, Resources.getString("CouldNotStartProgram"), exn);

@@ -10,10 +10,10 @@ import java.util.function.Function;
 
 public enum SensorType {
     NONE(brick -> null),
-    TOUCH(brick -> brick.TOUCH),
-    COLOR(brick -> brick.COLOR),
-    SOUND(brick -> brick.SOUND),
-    ULTRASONIC(brick -> brick.ULTRASONIC);
+    TOUCH(brick -> brick.getTouchSensor()),
+    COLOR(brick -> brick.getColorSensor()),
+    SOUND(brick -> brick.getSoundSensor()),
+    ULTRASONIC(brick -> brick.getUltrasonicSensor());
     
     // TODO add other sensors
     

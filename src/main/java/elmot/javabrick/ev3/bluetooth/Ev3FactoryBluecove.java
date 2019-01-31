@@ -33,7 +33,7 @@ public class Ev3FactoryBluecove {
                     
                     String port = btDevice.getBluetoothAddress();
                     Ev3Bluecove inst = new Ev3Bluecove(port);
-                    String brickname = inst.SYSTEM.getBrickName();
+                    String brickname = inst.getBrickname();
                     inst.close();
                     
                     if (brickname != null) {
