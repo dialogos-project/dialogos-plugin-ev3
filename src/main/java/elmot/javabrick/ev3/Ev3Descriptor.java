@@ -58,7 +58,7 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
             throw new UnsupportedOperationException("Unknown connection type.");
         }
         
-        Ev3Connector conn = null;
+        EV3 conn = null;
         
         switch (connectionType) {
             case USB:
@@ -74,7 +74,7 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
                 throw new UnsupportedOperationException("Unsupported connection type: " + connectionType.typestr);
         }
         
-        return new EV3(conn);
+        return conn;
     }
 
     public EV3 instantiateWithRetries(int numConnectionAttempts) throws IOException {
@@ -85,8 +85,13 @@ public class Ev3Descriptor implements Comparable<Ev3Descriptor> {
 
             try {
                 EV3 brick = instantiate();
+                
+                System.err.println("brick:");
+                System.err.println(brick);
 
                 if (brick != null) {
+                    System.err.println("not null");
+                    System.err.println(brick.SYSTEM);
                     brick.SYSTEM.getBrickName();
                     return brick;
                 }

@@ -1,7 +1,6 @@
 package elmot.javabrick.ev3.usb;
 
 import elmot.javabrick.ev3.EV3;
-import elmot.javabrick.ev3.Ev3Connector;
 
 import javax.usb.*;
 import java.io.IOException;
@@ -9,7 +8,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.logging.Logger;
 
-public class EV3Usb implements UsbInterfacePolicy, Ev3Connector {
+public class EV3Usb extends EV3 implements UsbInterfacePolicy {
 
     public static final boolean SUPPRESS_WARNINGS = true;
     public static final int EV3_USB_BLOCK_SIZE = 1024;

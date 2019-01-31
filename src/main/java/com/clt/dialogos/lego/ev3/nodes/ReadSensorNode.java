@@ -40,8 +40,6 @@ import elmot.javabrick.ev3.sensor.Mode;
 import elmot.javabrick.ev3.sensor.Port;
 import elmot.javabrick.ev3.sensor.RawOnlySensorFactory;
 import elmot.javabrick.ev3.sensor.SensorFactory;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 
 /**
  * @author dabo
@@ -70,7 +68,7 @@ public class ReadSensorNode extends Ev3Node {
     }
     
     private EV3 getBrick() {
-        return new EV3(new Ev3Dummy());
+        return new Ev3Dummy();
     }
     
     @Override

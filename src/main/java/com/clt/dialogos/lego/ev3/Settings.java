@@ -19,8 +19,6 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
 
 import com.clt.dialogos.plugin.PluginSettings;
 import com.clt.diamant.IdMap;
@@ -28,25 +26,20 @@ import com.clt.diamant.graph.Graph;
 import com.clt.event.ProgressListener;
 import com.clt.gui.OptionPane;
 import com.clt.gui.ProgressDialog;
-import com.clt.io.InterfaceType;
 import com.clt.properties.DefaultEnumProperty;
 import com.clt.properties.EnumProperty;
 import com.clt.properties.Property;
 import com.clt.properties.PropertySet;
 import com.clt.util.AbstractLongAction;
 import com.clt.util.UserCanceledException;
-import com.clt.xml.AbstractHandler;
 import com.clt.xml.XMLReader;
 import com.clt.xml.XMLWriter;
 import java.util.ArrayList;
 import java.util.List;
 import elmot.javabrick.ev3.Ev3Descriptor;
 import elmot.javabrick.ev3.EV3;
-import elmot.javabrick.ev3.Ev3Connector;
 import elmot.javabrick.ev3.sensor.Port;
 import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author dabo, koller

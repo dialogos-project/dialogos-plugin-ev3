@@ -1,6 +1,5 @@
 package elmot.javabrick.ev3;
 
-import elmot.javabrick.ev3.bluetooth.Ev3Bluecove;
 import elmot.javabrick.ev3.sensor.HTIRSeeker;
 import elmot.javabrick.ev3.sensor.CompassSensorFactory;
 import elmot.javabrick.ev3.sensor.IRSensorFactory;
@@ -14,12 +13,11 @@ import elmot.javabrick.ev3.sensor.SoundSensorFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
  * @author elmot
  */
-public class EV3 implements AutoCloseable {
+public abstract class EV3 implements AutoCloseable {
 
     public final MotorFactory MOTOR;
     public final ColorSensorFactory COLOR;
@@ -37,11 +35,7 @@ public class EV3 implements AutoCloseable {
 
     public final SystemFactory SYSTEM;
     
-    private final Ev3Connector connector;
-    
-    public EV3(Ev3Connector connector) {
-        this.connector = connector;
-        
+    public EV3() {
         MOTOR = new MotorFactory(this);
         COLOR = new ColorSensorFactory(this);
         SYSTEM = new SystemFactory(this);
@@ -58,16 +52,12 @@ public class EV3 implements AutoCloseable {
     }
 
     public synchronized Response run(CommandBlock commandBlock, Class<?>[] commandParameters) throws IOException {
-        connector.ensureOpen();
-        return commandBlock.run(connector, commandParameters);
+        ensureOpen();
+        return commandBlock.run(this, commandParameters);
     }
+    
+    abstract public void ensureOpen() throws IOException;
+    abstract public void close() throws IOException;
+    abstract public ByteBuffer dataExchange(ByteBuffer bytes, int expectedSeqNo) throws IOException;
 
-    @Override
-    public void close() throws IOException {
-        connector.close();
-    }
-
-    public Ev3Connector getConnector() {
-        return connector;
-    }
 }

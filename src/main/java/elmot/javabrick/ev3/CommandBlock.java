@@ -43,7 +43,7 @@ public class CommandBlock {
         return seqCounter.incrementAndGet() & 0x7fff;
     }
 
-    public Response run(Ev3Connector conn, Class<?>... outParametersTypes) throws IOException {
+    public Response run(EV3 ev3, Class<?>... outParametersTypes) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN);
         int seqNumber = getNextSeqCounter();
         buffer.putShort(2, (short) seqNumber);
@@ -67,7 +67,7 @@ public class CommandBlock {
         buffer.putShort(5, (short) memoryDeclarationHeader);
         buffer.rewind();
 
-        ByteBuffer responseBytes = conn.dataExchange(buffer, seqNumber);
+        ByteBuffer responseBytes = ev3.dataExchange(buffer, seqNumber);
 
         int readSeqNo = responseBytes.getShort(2);
         if (readSeqNo != seqNumber) {

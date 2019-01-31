@@ -86,7 +86,7 @@ public class FileSystem extends FactoryBase {
         cmd.putShort((short) (cmd.limit()-2));         // bytes 0-1: overwrite with actual message length (not counting bytes 0-1 themselves)
         cmd.rewind();
 
-        ByteBuffer response = brick.getConnector().dataExchange(cmd, messageSeqNumber);
+        ByteBuffer response = brick.dataExchange(cmd, messageSeqNumber);
 
         // process response
         response.rewind();
@@ -122,7 +122,7 @@ public class FileSystem extends FactoryBase {
             cmd.putShort((short) (cmd.limit()-2));         // bytes 0-1: overwrite with actual message length (not counting bytes 0-1 themselves)
             cmd.rewind();
 
-            response = brick.getConnector().dataExchange(cmd, messageSeqNumber);
+            response = brick.dataExchange(cmd, messageSeqNumber);
             response.rewind();
             response.position(8); // skip headers
 

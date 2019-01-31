@@ -1,7 +1,6 @@
 package elmot.javabrick.ev3.usb;
 
 import elmot.javabrick.ev3.EV3;
-import elmot.javabrick.ev3.Ev3Connector;
 import elmot.javabrick.ev3.Ev3Constants;
 import elmot.javabrick.ev3.Ev3Descriptor;
 import java.io.IOException;
@@ -36,10 +35,9 @@ public class EV3FactoryUsb {
                 } else if (desc.idVendor() == Ev3Constants.EV3_USB_VENDOR_ID && desc.idProduct() == Ev3Constants.EV3_USB_PRODUCT_ID) {
                     UsbInterface usbInterface = device.getActiveUsbConfiguration().getUsbInterface((byte) 0);
 
-                    EV3Usb inst = new EV3Usb(usbInterface);
-                    EV3 brick = new EV3(inst);
+                    EV3 brick = new EV3Usb(usbInterface);
                     String brickname = brick.SYSTEM.getBrickName();
-                    inst.close();
+                    brick.close();
 
                     String port = makeUsbLocation(device);
                     portsToInterfaces.put(port, usbInterface);
@@ -63,10 +61,10 @@ public class EV3FactoryUsb {
         }
     }
 
-    public static Ev3Connector instantiate(Ev3Descriptor descriptor) {
+    public static EV3 instantiate(Ev3Descriptor descriptor) {
         UsbInterface intf = portsToInterfaces.get(descriptor.getPort());
-        Ev3Connector conn = new EV3Usb(intf);
-        return conn;
+        EV3 brick = new EV3Usb(intf);
+        return brick;
     }
 
     private static String makeUsbLocation(UsbDevice dev) {

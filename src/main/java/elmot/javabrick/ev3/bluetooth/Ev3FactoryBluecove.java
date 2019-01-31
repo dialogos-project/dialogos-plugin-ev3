@@ -6,7 +6,6 @@
 package elmot.javabrick.ev3.bluetooth;
 
 import elmot.javabrick.ev3.EV3;
-import elmot.javabrick.ev3.Ev3Connector;
 import elmot.javabrick.ev3.Ev3Descriptor;
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +33,7 @@ public class Ev3FactoryBluecove {
                     
                     String port = btDevice.getBluetoothAddress();
                     Ev3Bluecove inst = new Ev3Bluecove(port);
-                    String brickname = new EV3(inst).SYSTEM.getBrickName();
+                    String brickname = inst.SYSTEM.getBrickName();
                     inst.close();
                     
                     if (brickname != null) {
@@ -77,7 +76,7 @@ public class Ev3FactoryBluecove {
     }
     
     
-    public static Ev3Connector instantiate(Ev3Descriptor descriptor) throws IOException {
+    public static EV3 instantiate(Ev3Descriptor descriptor) throws IOException {
         return new Ev3Bluecove(descriptor.getPort());
     }
 }

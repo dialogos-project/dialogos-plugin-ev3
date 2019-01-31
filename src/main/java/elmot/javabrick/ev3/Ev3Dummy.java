@@ -12,7 +12,7 @@ import java.nio.ByteBuffer;
  *
  * @author Alexander
  */
-public class Ev3Dummy implements Ev3Connector {
+public class Ev3Dummy extends EV3 {
     @Override
     public void ensureOpen() throws IOException {
         
@@ -25,7 +25,8 @@ public class Ev3Dummy implements Ev3Connector {
 
     @Override
     public ByteBuffer dataExchange(ByteBuffer bytes, int expectedSeqNo) throws IOException {
-        return null;
+        ByteBuffer response = ByteBuffer.allocate(0);
+        return response;
     }
     
 }
