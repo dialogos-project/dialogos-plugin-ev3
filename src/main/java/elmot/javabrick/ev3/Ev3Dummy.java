@@ -15,7 +15,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *
+ * A dummy implementation of EV3. This class does nothing when
+ * motors are controlled and programs are started, always returns
+ * a zero RAW value for all sensors, and returns a brick name of "(Dummy)".
+ * 
  * @author Alexander
  */
 public class Ev3Dummy extends EV3 {
