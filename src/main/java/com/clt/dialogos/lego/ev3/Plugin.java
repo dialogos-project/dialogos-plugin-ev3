@@ -21,9 +21,9 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
     @Override
     public void initialize() {
         registerNodeTypes(this.getName(), Arrays.asList(new Class<?>[]{
-            ProgramNode.class, 
-            StopProgramNode.class, 
-            ReadSensorNode.class, 
+            ProgramNode.class,
+            StopProgramNode.class,
+            ReadSensorNode.class,
             MotorNode.class
         }));
     }
@@ -44,7 +44,7 @@ public class Plugin implements com.clt.dialogos.plugin.Plugin {
     }
 
     @Override
-    public String getVersion() { return "2.0";  }  // DO NOT EDIT - This line is updated automatically by the make-release script.
+    public String getVersion() { return "2.1.1";  }  // DO NOT EDIT - This line is updated automatically by the make-release script.
 
     @Override
     public PluginSettings createDefaultSettings() {
